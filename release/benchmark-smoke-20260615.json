@@ -1,0 +1,26 @@
+{
+  "skill": "rfp-architect",
+  "scope": "single-task smoke benchmark (write mode: 線上訂飲料系統 RFP)",
+  "note": "pass_rate is MEASURED by rfp_lint grader (0 Blockers = pass). time_seconds and tokens are conservative estimates (per-run latency was not instrumented).",
+  "metadata": {
+    "skill_version": "2026.6.15",
+    "git_commit": "local-only",
+    "host": "openclaw/claude-code",
+    "model": "claude-opus-4-8",
+    "temperature": 1.0,
+    "run_timestamp": "2026-06-15T07:55:00Z",
+    "grader_version": "rfp_lint-1"
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0},
+      "time_seconds": {"mean": 18.0},
+      "tokens": {"mean": 5200}
+    },
+    "baseline": {
+      "pass_rate": {"mean": 0.0},
+      "time_seconds": {"mean": 10.0},
+      "tokens": {"mean": 2600}
+    }
+  }
+}

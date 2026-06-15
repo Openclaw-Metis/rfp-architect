@@ -1,0 +1,72 @@
+{
+  "skill_name": "rfp-architect",
+  "version": "2026.6.15",
+  "generated_at": "2026-06-15T07:58:23+00:00",
+  "commit": "local working tree",
+  "status": "PASS",
+  "checks": {
+    "format": "PASS",
+    "structure": "PASS",
+    "workflow_contract": "PASS",
+    "semantics": "PASS",
+    "semantic_rules": "PASS",
+    "gate_language": "PASS",
+    "lifecycle": "PASS",
+    "lifecycle_state": "PASS",
+    "eval_coverage": "PASS",
+    "eval_quality": "PASS",
+    "golden_trigger_set": "PASS",
+    "wrapper_drift": "PASS",
+    "migration_governance": "PASS",
+    "surface_drift": "PASS",
+    "skill_references": "PASS",
+    "unreferenced_files": "PASS",
+    "healthcheck": "PASS",
+    "benchmark": "PASS"
+  },
+  "benchmark": {
+    "path": "/home/ubuntu/.claude/skills/rfp-architect/release/benchmark-smoke-20260615.json",
+    "embedded_summary": true
+  },
+  "benchmark_summary": {
+    "artifact_type": "benchmark-summary",
+    "source_path": "/home/ubuntu/.claude/skills/rfp-architect/release/benchmark-smoke-20260615.json",
+    "source_sha256": "c913a91fcbf7b5f71ce610167d9524fe89d4481359a36373ee01839d7da5858b",
+    "metadata": {
+      "skill_version": "2026.6.15",
+      "git_commit": "local-only",
+      "host": "openclaw/claude-code",
+      "model": "claude-opus-4-8",
+      "temperature": 1.0,
+      "run_timestamp": "2026-06-15T07:55:00Z",
+      "grader_version": "rfp_lint-1"
+    },
+    "run_summary": {
+      "with_skill": {
+        "pass_rate": {
+          "mean": 1.0
+        },
+        "time_seconds": {
+          "mean": 18.0
+        },
+        "tokens": {
+          "mean": 5200
+        }
+      },
+      "baseline": {
+        "pass_rate": {
+          "mean": 0.0
+        },
+        "time_seconds": {
+          "mean": 10.0
+        },
+        "tokens": {
+          "mean": 2600
+        }
+      }
+    },
+    "notes": []
+  },
+  "blocking_findings": [],
+  "benchmark_summary_path": "release/benchmark-summary-2026.6.15.json"
+}

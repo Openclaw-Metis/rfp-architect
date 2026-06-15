@@ -1,0 +1,28 @@
+{
+  "mode": "write",
+  "must_include_sections": [
+    "業務背景與目標",
+    "工作範疇",
+    "功能需求",
+    "技術與非功能需求",
+    "資通安全",
+    "評選標準與配分",
+    "契約",
+    "投標須知"
+  ],
+  "must_include_taiwan_clauses": [
+    "資安分級",
+    "資料落地",
+    "繁體中文",
+    "著作權"
+  ],
+  "must_not_include": [
+    "TODO",
+    "待補",
+    "【填入"
+  ],
+  "lint_expectation": {
+    "max_blockers": 0
+  },
+  "minimum_use_cases": 1
+}

@@ -1,0 +1,184 @@
+{
+  "skill_name": "rfp-architect",
+  "benchmark_metadata_required": [
+    "skill_version",
+    "git_commit",
+    "host",
+    "model",
+    "temperature",
+    "run_timestamp",
+    "grader_version"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "write-gov-rfp-direct-zh",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": ["write", "should-trigger", "happy-path", "gov-procurement"],
+      "prompt": "我們是地方政府機關，要把一個民眾線上申辦系統委外開發，預算大約 800 萬，採最有利標。請幫我寫一份完整的委外開發 RFP（建議書徵求說明書），要包含資安要求。",
+      "expected_output": "一份依 11 章節填實的 RFP 草稿，含功能需求分級、評選配分表、序位法、評選委員會組成、資安分級與資料落地條款；結尾附 rfp_lint 覆蓋率與待確認清單。",
+      "files": [],
+      "expectations": [
+        "進入 write 模式並先確認標的/政府採購/預算",
+        "草稿包含『評選標準與配分』且載明權重與決標方式",
+        "包含資安分級、禁陸製或資料落地等台灣在地條款",
+        "rfp_lint.py 對草稿回報 0 個 Blocker 缺漏"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "review-rfp-missing-evaluation-zh",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": ["review", "should-trigger", "blocker-detection"],
+      "prompt": "這是我們承辦同仁起草的一份資訊系統委外 RFP，但裡面沒有寫評選配分，也沒有著作權歸屬的約定，幫我審查一下還有哪些問題、該怎麼補。",
+      "expected_output": "依嚴重度分級的 findings，至少標出『評選配分未載明』與『缺著作權歸屬』兩個 Blocker，各含定位、理由與可貼用修正；最後給 summary 與優先修正順序。",
+      "files": [],
+      "expectations": [
+        "進入 review 模式並先機械初篩",
+        "回報 [Blocker] 評選配分未載明",
+        "回報 [Blocker] 缺著作權歸屬約定",
+        "findings 在前、summary 在後，且不以『大致可用』稀釋 Blocker"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "write-rfp-mixed-lang",
+      "type": "functional",
+      "language": "mixed",
+      "trigger_class": "indirect",
+      "coverage_tags": ["write", "should-trigger", "english-trigger"],
+      "prompt": "I need to draft an RFP for outsourcing a customer-facing web app。我們是台灣公司，系統要繁體中文在地化，資料也要放在台灣。",
+      "expected_output": "write 模式產出 11 章節草稿，特別納入繁中在地化與資料落地需求。",
+      "files": [],
+      "expectations": [
+        "辨識為 write 模式（英文 trigger 也命中）",
+        "草稿包含繁體中文在地化與資料落地需求章節"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "knowledge-eval-method-zh",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": ["consult", "should-trigger"],
+      "prompt": "我們機關要辦一個資訊系統委外的最有利標案，我看到評選辦法裡有提到『序位法』，可以幫我解釋序位法到底怎麼計算、跟『評分及格最低標』差在哪裡嗎？",
+      "expected_output": "依 taiwan-procurement.md 解釋序位法（評分→轉序位→序位合計值最低且平均總評分 70 分以上者第 1 名），並說明與評分及格最低標的差異與消弭委員打分差異的用意。",
+      "files": [],
+      "expectations": [
+        "正確說明序位法計算步驟",
+        "提到平均總評分 70 分以上與序位合計值最低",
+        "說明最有利標與評分及格最低標的差異"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "negative-generic-writing",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": ["should-not-trigger", "near-miss"],
+      "prompt": "我想在公司部落格發一篇科普文章，介紹什麼是 RFP、它跟 RFI 與 RFQ 有什麼不同，幫我把這篇文章寫出來就好，不用做實際的採購文件。",
+      "expected_output": "不觸發本 skill（這是通用寫作，非撰寫/審查實際 RFP）。",
+      "files": [],
+      "expectations": [
+        "不進入 write/review 流程",
+        "辨識為通用寫作並交回一般處理"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "negative-rfq-pricing",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": ["should-not-trigger", "rfq-boundary"],
+      "prompt": "我要採購 100 台規格完全一樣的筆電，幫我跟三家廠商發詢價、整理一張比價表，挑最便宜且交期最快的就好。",
+      "expected_output": "不觸發本 skill（規格標準品比價屬 RFQ，非 RFP）。",
+      "files": [],
+      "expectations": [
+        "辨識為 RFQ/比價而非 RFP",
+        "不產出 RFP 草稿"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "near-miss-vendor-proposal",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": ["should-not-trigger", "near-miss", "should-ask"],
+      "prompt": "我是軟體廠商，下週要去投一個政府資訊系統標案，幫我寫我們公司要交出去回應招標的那份投標建議書。",
+      "expected_output": "先釐清：這是乙方回應用的 proposal，而本 skill 處理甲方發出的徵求文件（RFP）；確認後再決定是否適用，不直接套 RFP 撰寫流程。",
+      "files": [],
+      "expectations": [
+        "辨識 proposal（乙方）與 RFP（甲方徵求）之別",
+        "先確認再行動，不直接套甲方 RFP 撰寫流程"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "write-rfp-pure-english",
+      "type": "functional",
+      "language": "en",
+      "trigger_class": "direct",
+      "coverage_tags": ["write", "should-trigger", "english-trigger"],
+      "prompt": "Draft a request for proposal for outsourcing the development of an internal HR system for a Taiwan government agency, including evaluation criteria and information-security requirements.",
+      "expected_output": "write mode 11-section RFP draft; includes Taiwan-specific security grading, data residency, and most-advantageous-tender (最有利標) scoring even though the prompt is in English.",
+      "files": [],
+      "expectations": [
+        "Enters write mode from an English prompt",
+        "Includes Taiwan localization, data-residency and security-grading clauses"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "overlap-deep-research-handoff",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": ["should-not-trigger", "overlap-neighbor", "handoff"],
+      "prompt": "幫我做一份關於『委外 RFP 最佳實務』的深度研究報告，要彙整十幾個引用來源、附參考文獻，輸出成完整報告。",
+      "expected_output": "辨識為多來源研究報告需求（deep-research 範疇），建議 handoff，而非用本 skill 產 RFP 草稿。",
+      "files": [],
+      "expectations": [
+        "不誤把研究報告當成 RFP 撰寫",
+        "建議交給 deep-research skill"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "edge-case-mislabeled-rfq",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": ["edge-case", "should-ask", "should-not-trigger", "rfq-boundary"],
+      "prompt": "幫我寫一份 RFP，內容就是要採購 500 台規格一模一樣的伺服器，重點是選最便宜的廠商。",
+      "expected_output": "辨識標的其實是規格標準品比價（RFQ 較合適），先提醒；若使用者仍要 RFP，聚焦資格與服務而非最有利標創新評選。",
+      "files": [],
+      "expectations": [
+        "指出此標的較適合 RFQ 而非最有利標 RFP",
+        "先確認再決定產出形式"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "failure-mode-no-fabrication",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": ["failure-mode", "should-trigger", "should-ask", "no-fabrication"],
+      "prompt": "幫我寫一份系統委外的 RFP，預算金額和違約罰則的數字你直接幫我隨便填一個進去就好，我之後再改。",
+      "expected_output": "進入 write 模式但不臆造預算/罰則/法條數值；以『待確認』標記並請使用者提供或給範圍建議，不填假數字。",
+      "files": [],
+      "expectations": [
+        "不臆造具體預算或罰則數值",
+        "以『待確認』標記並請使用者補充"
+      ]
+    }
+  ]
+}

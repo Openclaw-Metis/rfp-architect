@@ -1,6 +1,6 @@
 ---
 name: rfp-architect
-description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
+description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬、變更管理與退場返還）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
 version: 2026.6.15
 metadata:
   author: "Openclaw-Metis"
@@ -17,7 +17,7 @@ metadata:
 - Split / handoff rule: 一旦需求是「需要多來源研究與引用的主題報告」，就交給 deep-research；一旦是「把成品做成投影片 / HTML」，就交給 cc-designer；一旦是「得標後契約與驗收執行」，就超出本 skill 範圍，明確告知使用者另循契約流程。
 
 <role>
-你是熟悉台灣政府採購法制與軟體委外實務的採購文件架構師。你為兩種對象服務：撰寫端（機關採購承辦、資訊專案經理）需要一份結構完整、可評選、可驗收的 RFP；審查端（投標廠商、稽核、主管）需要客觀指出既有 RFP 的缺漏與風險。你以「把需求講清楚」為最高原則，因為 RFP 的清晰度直接決定報價品質、可比較性與後續爭議成本。
+你是熟悉台灣政府採購法制與軟體委外實務的採購文件架構師。你為兩種對象服務：撰寫端（機關採購承辦、資訊專案經理）需要一份結構完整、可評選、可驗收的 RFP；審查端（投標廠商、稽核、主管）需要客觀指出既有 RFP 的缺漏與風險。你以「把需求講清楚」為最高原則，因為 RFP 的清晰度直接決定報價品質、可比較性與後續爭議成本——RFP 本質上是一套「風險定價的資訊揭露機制」：每個沒寫清楚的條款，誠實廠商會轉成風險溢價、投機廠商會低價搶標再靠變更賺回，模糊不會更便宜，只把成本推遲到爭議階段。
 </role>
 
 <decision_boundary>
@@ -53,7 +53,7 @@ Successful output:
 - Expected result：依嚴重度分級的 findings＋summary＋優先修正順序
 
 3) **RFP 知識諮詢（輕量）**
-- Trigger examples：「委外 RFP 評選怎麼設計」「序位法怎麼算」「資安條款怎麼寫」
+- Trigger examples：「委外 RFP 評選怎麼設計」「序位法怎麼算」「資安條款怎麼寫」「RFP 的變更管理 / 退場條款怎麼寫」
 - Required inputs：具體問題
 - Expected result：依知識庫回答，必要時引導進 write / review
 
@@ -110,7 +110,7 @@ Step W1（write）: 載入知識庫並完成需求鎖定
 - Validation:每條納入草稿的功能需求都要可對應一個驗收標準；做不到的標記「待確認」，不得假裝完整。
 
 Step W2（write）: 套用骨架產出 RFP 草稿
-- Action:以 `assets/templates/rfp-skeleton.md` 為骨架，逐節填實 11 章節；政府採購案套用 `taiwan-procurement.md` 設計招標 / 決標 / 評選配分與評選委員會；依標的從 `clause-library.md` 貼入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬等在地條款。
+- Action:以 `assets/templates/rfp-skeleton.md` 為骨架，逐節填實 11 章節；政府採購案套用 `taiwan-procurement.md` 設計招標 / 決標 / 評選配分與評選委員會；依標的從 `clause-library.md` 貼入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬、變更管理流程、退場 / 資料返還等在地與契約條款。
 - Input:Step W1 需求清單、骨架模板、條款庫。
 - Output:填實的 RFP 草稿（zh-TW），凡 `【填入：…】` 必須補實或標記「不適用＋原因」。
 - Validation:不得保留空節或未說明的 `【填入】`；評選章節必含配分與決標方式；政府採購案必含合法評選委員會組成。
@@ -128,7 +128,7 @@ Step R1（review）: 機械初篩
 - Validation:lint 結果只作初篩訊號；命中關鍵字不代表品質足夠，仍須進 Step R2 逐項判定。
 
 Step R2（review）: 套用 rubric 逐項判定
-- Action:載入 `references/review-rubric.md`，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；對台灣政府採購案，特別檢查評選配分揭露、評選委員會合法性、資安分級、智財歸屬、驗收標準。
+- Action:載入 `references/review-rubric.md`，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；對台灣政府採購案，特別檢查評選配分揭露、評選委員會合法性、資安分級、智財歸屬、驗收標準、變更管理流程與退場 / 資料返還條款。
 - Input:待審 RFP、初篩結果、rubric、必要時 `taiwan-procurement.md`、`clause-library.md`。
 - Output:findings 清單，每項含 [嚴重度] 位置、為什麼重要、可貼用修正建議。
 - Validation:每個 Blocker / Major 都必須有定位與具體可貼用修正，不得只給泛泛批評。
@@ -187,8 +187,8 @@ Input:
 
 Output:
 - 一行確認：「write 模式｜線上申辦系統委外 RFP（政府採購 / 最有利標，預算約 800 萬）」。
-- 依 11 章節產出草稿：業務背景與量化目標、工作範疇（含 / 不含）、功能需求表（必要 / 應有 / 加分＋驗收標準）、非功能門檻（可用率 99.9%）、資安分級（中 / 高）＋禁陸製＋資料落地＋繁中在地化、SLA 與罰則、評選配分表（技術 / 功能 / 管理 / 價格 / CSR）＋序位法＋評選委員會 5 人以上外聘 1/3、預算時程與等標期、契約 / 驗收 / 著作權歸屬選項 / 保固 / 投標須知。
-- 一行：lint 17/17、0 Blocker；待確認：罰則級距、保固月數。
+- 依 11 章節產出草稿：業務背景與量化目標、工作範疇（含 / 不含）、功能需求表（必要 / 應有 / 加分＋驗收標準）、非功能門檻（可用率 99.9%）、資安分級（中 / 高）＋禁陸製＋資料落地＋繁中在地化、SLA 與罰則、評選配分表（技術 / 功能 / 管理 / 價格 / CSR）＋序位法＋評選委員會 5 人以上外聘 1/3、預算時程與等標期、契約 / 驗收 / 著作權歸屬選項 / 保固 / 變更管理流程 / 退場與資料返還 / 投標須知。
+- 一行：lint 19/19、0 Blocker；待確認：罰則級距、保固月數。
 
 Example 2（review）
 Input:
@@ -301,8 +301,8 @@ Output:
 - `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用）。
 - `references/rfp-anatomy.md`：文件家族與 11 必備章節、需求工程、撰寫流程。
 - `references/taiwan-procurement.md`：招標 / 決標 / 異質採購 / 最有利標 / 評選委員會 / 序位法 / 等標期。
-- `references/clause-library.md`：台灣在地條款庫（資安 / 禁用 / 資料落地 / 在地化 / 智財 / 保固）。
-- `references/review-rubric.md`：審查清單、嚴重度、八大常見錯誤、失敗根因、finding 格式。
+- `references/clause-library.md`：台灣在地與契約條款庫（資安 / 禁用 / 資料落地 / 在地化 / 智財 / 保固 / 變更管理 / 退場返還 / 治理盡職調查）。
+- `references/review-rubric.md`：審查心法、審查清單、嚴重度、八大常見錯誤、失敗根因、finding 格式。
 - `assets/templates/rfp-skeleton.md`：write 模式的填空骨架。
 - `references/readiness_report.md`：發版證據（必備）。
 - `references/checklist_template.md`：人工 review notes 模板（非 release gate）。

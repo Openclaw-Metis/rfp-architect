@@ -1,39 +1,27 @@
 {
   "artifact_type": "benchmark-summary",
   "source_path": "/home/ubuntu/.claude/skills/rfp-architect/release/benchmark-smoke-20260615.json",
-  "source_sha256": "c913a91fcbf7b5f71ce610167d9524fe89d4481359a36373ee01839d7da5858b",
+  "source_sha256": "5effdd3210d0024bc5027c0f058ffdeec3afb09b36c7f347872a0def0335fed1",
   "metadata": {
     "skill_version": "2026.6.15",
     "git_commit": "local-only",
     "host": "openclaw/claude-code",
     "model": "claude-opus-4-8",
     "temperature": 1.0,
-    "run_timestamp": "2026-06-15T07:55:00Z",
-    "grader_version": "rfp_lint-1"
+    "run_timestamp": "2026-06-15T12:10:00Z",
+    "grader_version": "rfp_lint-2"
   },
   "run_summary": {
     "with_skill": {
-      "pass_rate": {
-        "mean": 1.0
-      },
-      "time_seconds": {
-        "mean": 18.0
-      },
-      "tokens": {
-        "mean": 5200
-      }
+      "pass_rate": {"mean": 1.0},
+      "time_seconds": {"mean": 18.0},
+      "tokens": {"mean": 5400}
     },
     "baseline": {
-      "pass_rate": {
-        "mean": 0.0
-      },
-      "time_seconds": {
-        "mean": 10.0
-      },
-      "tokens": {
-        "mean": 2600
-      }
+      "pass_rate": {"mean": 0.0},
+      "time_seconds": {"mean": 10.0},
+      "tokens": {"mean": 2600}
     }
   },
-  "notes": []
+  "notes": ["rfp_lint expanded from 17 to 19 checks (change-management = major, exit/transition = minor); regenerated 2026-06-15 same-day content revision."]
 }

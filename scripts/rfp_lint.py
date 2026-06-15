@@ -36,6 +36,8 @@ CHECKS = [
     ("ip",         "智財/著作權歸屬",           "blocker", ["著作", "智財", "智慧財產", "著作財產權", "授權", "intellectual property", "copyright"]),
     ("acceptance", "驗收標準",                  "blocker", ["驗收", "acceptance", "驗收標準"]),
     ("warranty",   "保固 / 維護",               "minor",   ["保固", "維護", "保固保證金", "warranty", "maintenance"]),
+    ("change_mgmt","變更管理 / 變更請求流程",   "major",   ["變更管理", "變更請求", "變更控制", "變更流程", "change request", "change control", "change management"]),
+    ("exit",       "退場 / 資料返還 / 移交",    "minor",   ["退場", "資料返還", "移交", "交接", "服務移轉", "退場計畫", "transition-out", "exit plan"]),
     ("submission", "投標須知 / 釋疑",           "major",   ["投標須知", "釋疑", "提交", "頁數", "submission", "格式"]),
 ]
 

@@ -1,7 +1,7 @@
 {
   "skill_name": "rfp-architect",
   "version": "2026.6.15",
-  "generated_at": "2026-06-15T07:58:23+00:00",
+  "generated_at": "2026-06-15T12:12:00+00:00",
   "commit": "local working tree",
   "status": "PASS",
   "checks": {
@@ -31,15 +31,15 @@
   "benchmark_summary": {
     "artifact_type": "benchmark-summary",
     "source_path": "/home/ubuntu/.claude/skills/rfp-architect/release/benchmark-smoke-20260615.json",
-    "source_sha256": "c913a91fcbf7b5f71ce610167d9524fe89d4481359a36373ee01839d7da5858b",
+    "source_sha256": "5effdd3210d0024bc5027c0f058ffdeec3afb09b36c7f347872a0def0335fed1",
     "metadata": {
       "skill_version": "2026.6.15",
       "git_commit": "local-only",
       "host": "openclaw/claude-code",
       "model": "claude-opus-4-8",
       "temperature": 1.0,
-      "run_timestamp": "2026-06-15T07:55:00Z",
-      "grader_version": "rfp_lint-1"
+      "run_timestamp": "2026-06-15T12:10:00Z",
+      "grader_version": "rfp_lint-2"
     },
     "run_summary": {
       "with_skill": {
@@ -50,7 +50,7 @@
           "mean": 18.0
         },
         "tokens": {
-          "mean": 5200
+          "mean": 5400
         }
       },
       "baseline": {
@@ -65,7 +65,9 @@
         }
       }
     },
-    "notes": []
+    "notes": [
+      "rfp_lint expanded 17->19 checks (change-management + exit/transition); same-day content revision grounded in the 57-source RFP research report."
+    ]
   },
   "blocking_findings": [],
   "benchmark_summary_path": "release/benchmark-summary-2026.6.15.json"

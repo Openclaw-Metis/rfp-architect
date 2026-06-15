@@ -3,6 +3,16 @@
 This file is release evidence for the current skill version.
 It records mechanical gate results and must be updated whenever `SKILL.md`, scripts, references, or eval assets change.
 
+## Change log — 2026-06-15 same-day content revision (report-grounded)
+Optimised against the 57-source RFP research report (`research_report_20260615_rfp-outsourcing.md`). Version kept at 2026.6.15 (same day; audit date not earlier than version date). Substantive changes:
+- `references/clause-library.md`: added clause families I (變更管理 / 變更請求流程), J (退場 / 資料返還 / 移交), K (專案治理與供應商盡職調查) — previously missing despite report findings 7–8.
+- `references/rfp-anatomy.md`: chapter 11 now covers change-management + exit/data-return; new §5 「三個設計／審查心法」 encoding the report's novel insights (RFP as risk-pricing disclosure / 最有利標 as forerunner of outcome-based procurement / acceptability across lifecycle).
+- `references/review-rubric.md`: new 審查心法 header + rubric §6 變更管理與退場 and §7 治理與盡職調查 with severities; prevention list made explicit.
+- `assets/templates/rfp-skeleton.md`: chapter 11 gains 變更管理流程 + 退場/資料返還 fields (keeps write-mode drafts self-consistent with the expanded linter).
+- `scripts/rfp_lint.py`: 17 → 19 checks (change_mgmt = major, exit = minor). grader_version bumped rfp_lint-1 → rfp_lint-2; benchmark + evidence regenerated with matching sha256.
+- `SKILL.md`: role gains the risk-pricing framing; description, Step W2/R2, Example 1 (lint 19/19), use case 3, Resources updated.
+- Removed `README.md` from inside the skill folder (relocated to repo root) — fixes the only baseline format Blocker.
+
 ## Final gate
 - Current version reviewed: 2026.6.15
 - Overall status: PASS (draft + publish release gates). Publish gate is backed by a single-task smoke benchmark — pass-rate is measured by `rfp_lint` (with-skill 1.0 vs baseline 0.0), while time/token figures are conservative estimates (not per-run instrumented). A fuller multi-eval instrumented benchmark is recommended before wide distribution.
@@ -12,7 +22,7 @@ It records mechanical gate results and must be updated whenever `SKILL.md`, scri
   - `release_gate.py --stage draft` (skill-creator-advanced toolchain, not a local script) → PASS
   - `stage_gate.py --stage create` (skill-creator-advanced toolchain, not a local script) → PASS
   - Component audits PASS: format, structure, workflow_contract, semantics, semantic_rules, gate_language, lifecycle, lifecycle_state, eval_coverage, eval_quality, golden_trigger_set, wrapper_drift, migration_governance, surface_drift, unreferenced_files, skill_references, healthcheck
-  - `python3 scripts/rfp_lint.py` self-test: 17/17 on the reference report and skeleton; correctly fails a stub RFP with the right Blockers
+  - `python3 scripts/rfp_lint.py` self-test: 19/19 on the reference report and skeleton; correctly fails a stub RFP with the right Blockers (lint expanded from 17 to 19 checks: + change-management [major] + exit/transition [minor])
 - Audit date: 2026-06-15
 - Git commit: local-only (not in a git repository)
 - Audit runner: local (skill-creator-advanced toolchain)

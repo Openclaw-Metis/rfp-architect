@@ -1,0 +1,48 @@
+{
+  "artifact_type": "benchmark-summary",
+  "source_path": "release/benchmark-smoke-20260616.json",
+  "source_sha256": "7ca517d20cf3c872afe63296d48f90a4b36fdb9c4ff3f41f4334a065b0c2479e",
+  "metadata": {
+    "skill_version": "2026.6.16",
+    "git_commit": "f80f3bcce0833ea8152cc7d509edd2c98a434739+dirty",
+    "host": "codex-desktop/local",
+    "model": "gpt-5-codex",
+    "temperature": 1.0,
+    "run_timestamp": "2026-06-16T00:00:00+08:00",
+    "grader_version": "rfp_lint-5"
+  },
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0
+      },
+      "time_seconds": {
+        "mean": 18.0
+      },
+      "tokens": {
+        "mean": 5800
+      }
+    },
+    "baseline": {
+      "pass_rate": {
+        "mean": 0.0
+      },
+      "time_seconds": {
+        "mean": 10.0
+      },
+      "tokens": {
+        "mean": 2600
+      },
+      "status": "previous_smoke_not_rerun"
+    },
+    "selftests": {
+      "rfp_lint_selftest": "PASS",
+      "example_output_lint": "PASS",
+      "skeleton_placeholder_lint": "EXPECTED_FAIL"
+    }
+  },
+  "notes": [
+    "V4/V5 hardening: government non-fixed price <20% or >50% now fails; fixed-price <20% is informational; enterprise track skips government price law; weight sum !=100 fails.",
+    "Baseline values are carried from the prior smoke benchmark only for mechanical regression-gate compatibility; full paired baseline rerun remains required before public registry publication."
+  ]
+}

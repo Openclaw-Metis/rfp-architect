@@ -11,5 +11,11 @@
     "edge-case",
     "failure-mode"
   ],
-  "required_eval_languages": ["zh", "en", "mixed"]
+  "required_eval_languages": ["zh", "en", "mixed"],
+  "required_rule_regressions": [
+    "gov-price-over-50-fails",
+    "gov-fixed-price-under-20-info",
+    "enterprise-track-no-gov-price-rule",
+    "weight-sum-not-100-fails"
+  ]
 }

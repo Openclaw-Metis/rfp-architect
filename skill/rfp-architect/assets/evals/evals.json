@@ -266,6 +266,71 @@
         "草稿載明公費 ≤25%、管理費 ≤100% 之法定上限",
         "提及價格配分 20%–50% 法定區間或固定價格例外"
       ]
+    },
+    {
+      "id": 14,
+      "name": "lint-gov-price-over-50-fails",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement",
+        "regression"
+      ],
+      "prompt": "這份政府機關資訊系統最有利標 RFP 的評選表已經加總 100%，但價格配分 60%、技術 40%，不是固定價格案。請審查是否可以發布。",
+      "expected_output": "必須回報 [Blocker] 價格配分 60% 逾 50% 上限；不得因章節完整或配分合計 100% 而放行。",
+      "files": [],
+      "expectations": [
+        "進入 review 模式",
+        "政府非固定價格案價格 >50% 被判定為 Blocker",
+        "結論不得為 PASS"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "lint-gov-fixed-price-under-20-info",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "gov-procurement",
+        "fixed-price-exception",
+        "regression"
+      ],
+      "prompt": "我們機關預算已定案，採固定價格給付辦理資訊系統委外，評選想放價格合理性 10%。請幫我檢查 RFP 配分是否合法。",
+      "expected_output": "說明固定價格給付案價格權重可低於 20%，但 RFP 必須明載固定價格 / 固定費用；不得誤報為非固定價格案 Blocker。",
+      "files": [],
+      "expectations": [
+        "辨識固定價格給付例外",
+        "價格 10% 不被當成非固定價格案違規",
+        "提醒招標文件須明載固定價格給付"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "enterprise-track-no-gov-price-rule",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "enterprise-track",
+        "regression"
+      ],
+      "prompt": "我們是一般企業，要委外開發 CRM，評選想用技術 70%、價格 30%，不適用政府採購法。請幫我整理 RFP 評選章節。",
+      "expected_output": "進入企業委外軌，聚焦商業條款、SLA、智財、資安、個資、付款與退場；不得硬套政府採購法的最有利標程序或評選委員會要求。",
+      "files": [],
+      "expectations": [
+        "辨識為企業委外軌",
+        "不要求政府評選委員會或等標期",
+        "不把企業價格配分當政府採購法違規"
+      ]
     }
   ]
 }

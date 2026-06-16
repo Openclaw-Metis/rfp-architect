@@ -1,0 +1,52 @@
+[
+  {
+    "id": "trigger-direct-write-zh",
+    "query": "幫我寫一份民眾線上申辦系統的委外開發 RFP",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-direct-review-zh",
+    "query": "幫我審查這份需求說明書，看它能不能拿去招標",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-indirect-spec-zh",
+    "query": "我要發包一個資訊系統，招標需求規格應該怎麼起草",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-en-write",
+    "query": "Draft an RFP for outsourcing a software development project for a Taiwan agency.",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-mixed-review",
+    "query": "review 這份 RFP，尤其是 scoring matrix 和資安條款",
+    "should_trigger": true
+  },
+  {
+    "id": "non-trigger-blog",
+    "query": "幫我寫一篇部落格文章介紹 RFP、RFI、RFQ 的差異，不用做實際採購文件",
+    "should_trigger": false
+  },
+  {
+    "id": "non-trigger-rfq",
+    "query": "我要採購 100 台規格一樣的筆電，幫我整理三家報價比價表",
+    "should_trigger": false
+  },
+  {
+    "id": "non-trigger-vendor-proposal",
+    "query": "我是投標廠商，幫我寫我們要交出去的投標建議書",
+    "should_trigger": false
+  },
+  {
+    "id": "non-trigger-sow-contract",
+    "query": "得標後我們要逐條談 SOW 和契約付款條款，請幫我談判",
+    "should_trigger": false
+  },
+  {
+    "id": "non-trigger-research-report",
+    "query": "幫我做一份委外 RFP 最佳實務深度研究報告，要引用十幾個來源",
+    "should_trigger": false
+  }
+]

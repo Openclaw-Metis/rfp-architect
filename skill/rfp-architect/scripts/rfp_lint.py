@@ -5,7 +5,7 @@ rfp_lint.py — deterministic linter for an RFP (建議書徵求說明書) draft
 Two layers:
 1) Completeness (keyword-based): does the draft mention every mandatory section /
    Taiwan-specific clause? Presence ≠ quality — a HIT still needs rubric review.
-2) Compliance rules (regex-based, V3): catches a class of HIGH-RISK errors that a
+2) Compliance rules (regex-based, V4): catches a class of HIGH-RISK errors that a
    keyword check cannot — leftover placeholders, price weight outside the statutory
    20%–50% band, simulation weight over 20%, and評選 weights not summing to 100%.
 
@@ -14,13 +14,18 @@ Used by both modes:
 - review mode: a mechanical first pass before the rubric-based human judgement.
 
 Usage:
-    python3 scripts/rfp_lint.py <rfp_file.md|.txt> [--json]
-    cat rfp.md | python3 scripts/rfp_lint.py - [--json]
+    python3 scripts/rfp_lint.py <rfp_file.md|.txt> [--json] [--track auto|government|enterprise] [--fixed-price]
+    cat rfp.md | python3 scripts/rfp_lint.py - [--json] [--track auto|government|enterprise] [--fixed-price]
 
 Exit code: 0 if clean or only advisory warnings; 1 if a Blocker section is missing,
 a placeholder remains (draft not finished), or a clear rule violation fires.
 """
-import sys, json, re
+import argparse
+import json
+import re
+import sys
+
+GRADER_VERSION = "rfp_lint-5"
 
 # ---- Layer 1: completeness (key, label, severity, [keywords; any match = present]) ----
 CHECKS = [
@@ -48,8 +53,9 @@ CHECKS = [
 
 SEV_RANK = {"blocker": 0, "major": 1, "minor": 2}
 
-# placeholders that must be gone in a finished draft
-_PLACEHOLDERS = ["【填入", "【__", "__%", "待補", "待確認", "TODO", "xxx%", "XX%"]
+# placeholders that must be gone in a finished draft. "待確認" is intentionally
+# allowed because SKILL.md permits a final explicit confirmation list.
+_PLACEHOLDERS = ["【填入", "【__", "__%", "待補", "TODO", "xxx%", "XX%"]
 # integer percentage, excluding decimals like 99.9% (lookbehind rejects a preceding digit or dot)
 _INT_PCT = re.compile(r"(?<![\d.])(\d{1,3})\s*%(?!\.\d)")
 
@@ -80,9 +86,34 @@ def _label_pct(blob: str, label_re: str):
     return vals
 
 
-def rule_checks(text: str):
+def _detect_track(text: str, requested: str) -> str:
+    """Infer whether Taiwan government procurement rules should apply."""
+    if requested != "auto":
+        return requested
+    government_markers = (
+        "政府採購", "政府機關", "公法人", "受採購法", "採購法", "最有利標",
+        "等標期", "評選委員會", "採購評選委員會", "機關委託資訊服務",
+    )
+    enterprise_markers = ("一般企業", "企業委外", "公司採購", "民間企業")
+    gov_hits = sum(1 for k in government_markers if k in text)
+    ent_hits = sum(1 for k in enterprise_markers if k in text)
+    if gov_hits:
+        return "government"
+    if ent_hits:
+        return "enterprise"
+    return "unknown"
+
+
+def _detect_fixed_price(text: str, forced: bool) -> bool:
+    if forced:
+        return True
+    return any(k in text for k in ("固定價格", "固定費用", "固定服務費用", "固定費率", "預算已定案", "預算確定"))
+
+
+def rule_checks(text: str, track: str = "auto", fixed_price: bool = False):
     """Layer 2: regex compliance rules. Returns list of findings."""
     findings = []
+    effective_track = _detect_track(text, track)
 
     # placeholder_rule — a finished RFP must not contain template placeholders
     low = text.lower()
@@ -95,25 +126,37 @@ def rule_checks(text: str):
 
     sec = _eval_section(text)
     if sec:
-        # presentation_weight_rule — 簡報/現場詢答 weight must be ≤20% (no statutory exception)
-        for v in _label_pct(sec, r"(?:簡報|現場詢答|詢答)"):
-            if v > 20:
-                findings.append({
-                    "rule": "presentation_weight", "severity": "major",
-                    "message": f"簡報 / 詢答配分 {v}% 逾《最有利標評選辦法》20% 上限。"
-                })
-                break
-        # price_weight_rule — price 20%–50% unless fixed-price案 → advisory (warning)
-        fixed_price = any(k in text for k in ("固定價格", "固定費用", "預算已定案", "預算確定"))
-        for v in _label_pct(sec, r"價格"):
-            if v < 20 or v > 50:
-                note = "；惟若為固定價格給付案則得低於 20%，請確認" if (v < 20 and fixed_price) else ""
-                findings.append({
-                    "rule": "price_weight", "severity": "warning",
-                    "message": f"價格配分 {v}% 不在《最有利標評選辦法》§16/§17 之 20%–50%；"
-                               f"非固定價格案即違規{note}。"
-                })
-                break
+        # Taiwan government procurement compliance rules.
+        if effective_track == "government":
+            # presentation_weight_rule — 簡報/現場詢答 weight must be ≤20% (no statutory exception)
+            for v in _label_pct(sec, r"(?:簡報|現場詢答|詢答)"):
+                if v > 20:
+                    findings.append({
+                        "rule": "presentation_weight", "severity": "major",
+                        "message": f"簡報 / 詢答配分 {v}% 逾《最有利標評選辦法》§10 之 20% 上限。"
+                    })
+                    break
+            # price_weight_rule — price 20%–50% unless fixed-price案 only for the lower bound.
+            is_fixed_price = _detect_fixed_price(text, fixed_price)
+            for v in _label_pct(sec, r"價格"):
+                if v > 50:
+                    findings.append({
+                        "rule": "price_weight", "severity": "blocker",
+                        "message": f"價格配分 {v}% 逾《最有利標評選辦法》§16/§17 之 50% 上限。"
+                    })
+                    break
+                if v < 20:
+                    if is_fixed_price:
+                        findings.append({
+                            "rule": "price_weight", "severity": "info",
+                            "message": f"固定價格給付案價格配分 {v}% 低於 20%；此為固定價格例外，仍應於招標文件明載固定價格給付。"
+                        })
+                    else:
+                        findings.append({
+                            "rule": "price_weight", "severity": "blocker",
+                            "message": f"非固定價格案價格配分 {v}% 低於《最有利標評選辦法》§16/§17 之 20% 下限。"
+                        })
+                    break
         # weight_sum_rule — 評選 weights should sum to ~100% (only count table-row %, not prose)
         row_pcts = []
         for ln in sec.splitlines():
@@ -123,14 +166,14 @@ def rule_checks(text: str):
             total = sum(row_pcts)
             if not (98 <= total <= 102):
                 findings.append({
-                    "rule": "weight_sum", "severity": "warning",
-                    "message": f"評選配分合計約 {total}%（偵測 {len(row_pcts)} 項表格配分），宜為 100%，請確認。"
+                    "rule": "weight_sum", "severity": "major",
+                    "message": f"評選配分合計約 {total}%（偵測 {len(row_pcts)} 項表格配分），應修正為 100%。"
                 })
 
     return findings
 
 
-def lint(text: str):
+def lint(text: str, track: str = "auto", fixed_price: bool = False):
     low = text.lower()
     present, missing = [], []
     for key, label, sev, kws in CHECKS:
@@ -138,7 +181,7 @@ def lint(text: str):
         (present if hit else missing).append({"key": key, "label": label, "severity": sev})
     missing.sort(key=lambda m: SEV_RANK[m["severity"]])
     blockers = [m for m in missing if m["severity"] == "blocker"]
-    rules = rule_checks(text)
+    rules = rule_checks(text, track=track, fixed_price=fixed_price)
     rule_block = [r for r in rules if r["severity"] in ("blocker", "major")]
     score = round(100 * len(present) / len(CHECKS))
     ok = (len(blockers) == 0) and (len(rule_block) == 0)
@@ -151,26 +194,34 @@ def lint(text: str):
         "rule_findings": rules,
         "rule_violations": len(rule_block),
         "rule_warnings": len([r for r in rules if r["severity"] == "warning"]),
+        "rule_infos": len([r for r in rules if r["severity"] == "info"]),
+        "effective_track": _detect_track(text, track),
+        "grader_version": GRADER_VERSION,
         "pass": ok,
     }
 
 
 def main():
-    args = [a for a in sys.argv[1:] if a != "--json"]
-    as_json = "--json" in sys.argv
-    if not args:
-        print("usage: rfp_lint.py <rfp_file|-> [--json]", file=sys.stderr)
-        sys.exit(2)
-    src = args[0]
+    parser = argparse.ArgumentParser(description="Lint an outsourced software/system RFP draft.")
+    parser.add_argument("src", help="RFP file path, or '-' for stdin")
+    parser.add_argument("--json", action="store_true", help="emit JSON")
+    parser.add_argument("--track", choices=["auto", "government", "enterprise"], default="auto",
+                        help="apply Taiwan government procurement rules, enterprise rules, or infer from text")
+    parser.add_argument("--fixed-price", action="store_true",
+                        help="treat the RFP as a fixed-price/fixed-fee government procurement case")
+    ns = parser.parse_args()
+    src = ns.src
     text = sys.stdin.read() if src == "-" else open(src, encoding="utf-8").read()
-    res = lint(text)
-    if as_json:
+    res = lint(text, track=ns.track, fixed_price=ns.fixed_price)
+    if ns.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     else:
         verdict = "PASS" if res["pass"] else "FAIL"
         tail = ""
         if res["pass"] and res["rule_warnings"]:
             tail = f"｜⚠ {res['rule_warnings']} 項合規風險待確認"
+        if res["pass"] and res["rule_infos"]:
+            tail += f"｜ℹ {res['rule_infos']} 項說明"
         print(f"RFP 完整度：{res['present']}/{res['total_checks']} 章節 ({res['coverage_pct']}%)  {verdict}{tail}")
         if res["missing"]:
             print("章節缺漏：")

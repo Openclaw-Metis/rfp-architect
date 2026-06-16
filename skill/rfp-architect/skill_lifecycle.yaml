@@ -21,12 +21,15 @@ risk:
 dependencies:
   scripts:
     - scripts/rfp_lint.py
+    - scripts/rfp_lint_selftest.py
+    - scripts/audit_release_evidence.py
   references:
     - references/rfp-anatomy.md
     - references/taiwan-procurement.md
     - references/clause-library.md
     - references/review-rubric.md
     - references/case-patterns.md
+    - references/source-register.md
     - references/readiness_report.md
 stewardship:
   reviewers: []

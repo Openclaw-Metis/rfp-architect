@@ -1,0 +1,18 @@
+{
+  "skill": "rfp-architect",
+  "scope": "single-task smoke benchmark (write mode: 民眾線上申辦系統 RFP)",
+  "note": "pass_rate is MEASURED by rfp_lint grader. V3 grader = 20 completeness checks + 4 regex compliance rules (placeholder / presentation_weight / price_weight / weight_sum); a draft passes only with 0 missing Blockers AND 0 rule violations. time_seconds and tokens are conservative estimates (per-run latency not instrumented). A full instrumented run across the 13-eval set remains a deferred item.",
+  "metadata": {
+    "skill_version": "2026.6.16",
+    "git_commit": "local-only",
+    "host": "openclaw/claude-code",
+    "model": "claude-opus-4-8",
+    "temperature": 1.0,
+    "run_timestamp": "2026-06-16T14:30:00Z",
+    "grader_version": "rfp_lint-4"
+  },
+  "run_summary": {
+    "with_skill": { "pass_rate": {"mean": 1.0}, "time_seconds": {"mean": 18.0}, "tokens": {"mean": 5800} },
+    "baseline":   { "pass_rate": {"mean": 0.0}, "time_seconds": {"mean": 10.0}, "tokens": {"mean": 2600} }
+  }
+}

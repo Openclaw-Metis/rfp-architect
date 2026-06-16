@@ -1,5 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Skill specification",
-  "type": "object"
+  "title": "Skill specification (SKILL.md frontmatter)",
+  "type": "object",
+  "required": ["name", "description"],
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "description": { "type": "string", "minLength": 40 },
+    "version": { "type": "string" },
+    "license": { "type": "string" }
+  }
 }

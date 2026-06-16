@@ -1,5 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Skill release evidence",
-  "type": "object"
+  "type": "object",
+  "required": ["skill_name", "version", "status", "checks"],
+  "properties": {
+    "skill_name": { "type": "string" },
+    "version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "status": { "enum": ["PASS", "FAIL", "BLOCKED"] },
+    "checks": {
+      "type": "object",
+      "additionalProperties": { "enum": ["PASS", "FAIL", "SKIP"] }
+    },
+    "benchmark_summary": { "type": "object" },
+    "blocking_findings": { "type": "array" }
+  }
 }

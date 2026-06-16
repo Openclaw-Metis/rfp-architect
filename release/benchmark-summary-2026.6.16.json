@@ -1,0 +1,15 @@
+{
+  "artifact_type": "benchmark-summary",
+  "source_path": "/home/ubuntu/.claude/skills/rfp-architect/release/benchmark-smoke-20260616.json",
+  "source_sha256": "0d24c10e844f9f40861967feee2ff7eb9f9189fa43110fb5fbf2df1d5e882f13",
+  "metadata": {
+    "skill_version": "2026.6.16", "git_commit": "local-only", "host": "openclaw/claude-code",
+    "model": "claude-opus-4-8", "temperature": 1.0,
+    "run_timestamp": "2026-06-16T14:30:00Z", "grader_version": "rfp_lint-4"
+  },
+  "run_summary": {
+    "with_skill": { "pass_rate": {"mean": 1.0}, "time_seconds": {"mean": 18.0}, "tokens": {"mean": 5800} },
+    "baseline":   { "pass_rate": {"mean": 0.0}, "time_seconds": {"mean": 10.0}, "tokens": {"mean": 2600} }
+  },
+  "notes": ["V3: rfp_lint upgraded to keyword(20)+rules(4); grader rfp_lint-4. The keyword-complete-but-violating RFP (價格60%/簡報30%) now fails the grader."]
+}

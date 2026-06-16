@@ -16,7 +16,12 @@
       "type": "functional",
       "language": "zh",
       "trigger_class": "direct",
-      "coverage_tags": ["write", "should-trigger", "happy-path", "gov-procurement"],
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "happy-path",
+        "gov-procurement"
+      ],
       "prompt": "我們是地方政府機關，要把一個民眾線上申辦系統委外開發，預算大約 800 萬，採最有利標。請幫我寫一份完整的委外開發 RFP（建議書徵求說明書），要包含資安要求。",
       "expected_output": "一份依 11 章節填實的 RFP 草稿，含功能需求分級、評選配分表、序位法、評選委員會組成、資安分級與資料落地條款；結尾附 rfp_lint 覆蓋率與待確認清單。",
       "files": [],
@@ -33,7 +38,11 @@
       "type": "functional",
       "language": "zh",
       "trigger_class": "direct",
-      "coverage_tags": ["review", "should-trigger", "blocker-detection"],
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection"
+      ],
       "prompt": "這是我們承辦同仁起草的一份資訊系統委外 RFP，但裡面沒有寫評選配分，也沒有著作權歸屬的約定，幫我審查一下還有哪些問題、該怎麼補。",
       "expected_output": "依嚴重度分級的 findings，至少標出『評選配分未載明』與『缺著作權歸屬』兩個 Blocker，各含定位、理由與可貼用修正；最後給 summary 與優先修正順序。",
       "files": [],
@@ -50,7 +59,11 @@
       "type": "functional",
       "language": "mixed",
       "trigger_class": "indirect",
-      "coverage_tags": ["write", "should-trigger", "english-trigger"],
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "english-trigger"
+      ],
       "prompt": "I need to draft an RFP for outsourcing a customer-facing web app。我們是台灣公司，系統要繁體中文在地化，資料也要放在台灣。",
       "expected_output": "write 模式產出 11 章節草稿，特別納入繁中在地化與資料落地需求。",
       "files": [],
@@ -65,13 +78,16 @@
       "type": "functional",
       "language": "zh",
       "trigger_class": "indirect",
-      "coverage_tags": ["consult", "should-trigger"],
+      "coverage_tags": [
+        "consult",
+        "should-trigger"
+      ],
       "prompt": "我們機關要辦一個資訊系統委外的最有利標案，我看到評選辦法裡有提到『序位法』，可以幫我解釋序位法到底怎麼計算、跟『評分及格最低標』差在哪裡嗎？",
-      "expected_output": "依 taiwan-procurement.md 解釋序位法（評分→轉序位→序位合計值最低且平均總評分 70 分以上者第 1 名），並說明與評分及格最低標的差異與消弭委員打分差異的用意。",
+      "expected_output": "依 taiwan-procurement.md 解釋序位法（各委員評分→轉序位→序位合計值最低者為序位第一），並說明機關得另訂合格（門檻）分數（實務常見總平均 70 分，但屬機關自訂、非法定固定值），以及與評分及格最低標的差異與消弭委員打分差異的用意。",
       "files": [],
       "expectations": [
-        "正確說明序位法計算步驟",
-        "提到平均總評分 70 分以上與序位合計值最低",
+        "正確說明序位法計算步驟（評分→序位→序位合計值最低者第一）",
+        "說明 70 分是機關得自訂的合格門檻、非法定固定值（不得寫成通則）",
         "說明最有利標與評分及格最低標的差異"
       ]
     },
@@ -81,7 +97,10 @@
       "type": "trigger",
       "language": "zh",
       "trigger_class": "negative",
-      "coverage_tags": ["should-not-trigger", "near-miss"],
+      "coverage_tags": [
+        "should-not-trigger",
+        "near-miss"
+      ],
       "prompt": "我想在公司部落格發一篇科普文章，介紹什麼是 RFP、它跟 RFI 與 RFQ 有什麼不同，幫我把這篇文章寫出來就好，不用做實際的採購文件。",
       "expected_output": "不觸發本 skill（這是通用寫作，非撰寫/審查實際 RFP）。",
       "files": [],
@@ -96,7 +115,10 @@
       "type": "trigger",
       "language": "zh",
       "trigger_class": "negative",
-      "coverage_tags": ["should-not-trigger", "rfq-boundary"],
+      "coverage_tags": [
+        "should-not-trigger",
+        "rfq-boundary"
+      ],
       "prompt": "我要採購 100 台規格完全一樣的筆電，幫我跟三家廠商發詢價、整理一張比價表，挑最便宜且交期最快的就好。",
       "expected_output": "不觸發本 skill（規格標準品比價屬 RFQ，非 RFP）。",
       "files": [],
@@ -111,7 +133,11 @@
       "type": "trigger",
       "language": "zh",
       "trigger_class": "negative",
-      "coverage_tags": ["should-not-trigger", "near-miss", "should-ask"],
+      "coverage_tags": [
+        "should-not-trigger",
+        "near-miss",
+        "should-ask"
+      ],
       "prompt": "我是軟體廠商，下週要去投一個政府資訊系統標案，幫我寫我們公司要交出去回應招標的那份投標建議書。",
       "expected_output": "先釐清：這是乙方回應用的 proposal，而本 skill 處理甲方發出的徵求文件（RFP）；確認後再決定是否適用，不直接套 RFP 撰寫流程。",
       "files": [],
@@ -126,7 +152,11 @@
       "type": "functional",
       "language": "en",
       "trigger_class": "direct",
-      "coverage_tags": ["write", "should-trigger", "english-trigger"],
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "english-trigger"
+      ],
       "prompt": "Draft a request for proposal for outsourcing the development of an internal HR system for a Taiwan government agency, including evaluation criteria and information-security requirements.",
       "expected_output": "write mode 11-section RFP draft; includes Taiwan-specific security grading, data residency, and most-advantageous-tender (最有利標) scoring even though the prompt is in English.",
       "files": [],
@@ -141,7 +171,11 @@
       "type": "trigger",
       "language": "zh",
       "trigger_class": "negative",
-      "coverage_tags": ["should-not-trigger", "overlap-neighbor", "handoff"],
+      "coverage_tags": [
+        "should-not-trigger",
+        "overlap-neighbor",
+        "handoff"
+      ],
       "prompt": "幫我做一份關於『委外 RFP 最佳實務』的深度研究報告，要彙整十幾個引用來源、附參考文獻，輸出成完整報告。",
       "expected_output": "辨識為多來源研究報告需求（deep-research 範疇），建議 handoff，而非用本 skill 產 RFP 草稿。",
       "files": [],
@@ -156,7 +190,12 @@
       "type": "trigger",
       "language": "zh",
       "trigger_class": "negative",
-      "coverage_tags": ["edge-case", "should-ask", "should-not-trigger", "rfq-boundary"],
+      "coverage_tags": [
+        "edge-case",
+        "should-ask",
+        "should-not-trigger",
+        "rfq-boundary"
+      ],
       "prompt": "幫我寫一份 RFP，內容就是要採購 500 台規格一模一樣的伺服器，重點是選最便宜的廠商。",
       "expected_output": "辨識標的其實是規格標準品比價（RFQ 較合適），先提醒；若使用者仍要 RFP，聚焦資格與服務而非最有利標創新評選。",
       "files": [],
@@ -171,13 +210,61 @@
       "type": "functional",
       "language": "zh",
       "trigger_class": "direct",
-      "coverage_tags": ["failure-mode", "should-trigger", "should-ask", "no-fabrication"],
+      "coverage_tags": [
+        "failure-mode",
+        "should-trigger",
+        "should-ask",
+        "no-fabrication"
+      ],
       "prompt": "幫我寫一份系統委外的 RFP，預算金額和違約罰則的數字你直接幫我隨便填一個進去就好，我之後再改。",
       "expected_output": "進入 write 模式但不臆造預算/罰則/法條數值；以『待確認』標記並請使用者提供或給範圍建議，不填假數字。",
       "files": [],
       "expectations": [
         "不臆造具體預算或罰則數值",
         "以『待確認』標記並請使用者補充"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "review-price-weight-over-50-zh",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement"
+      ],
+      "prompt": "幫我審查這份政府機關資訊系統委外的最有利標 RFP。評選配分我設定技術 30%、價格 60%、簡報 10%，廠商要報價。其他章節都齊全，麻煩看看有沒有問題。",
+      "expected_output": "review 模式回報 [Blocker] 價格權重 60% 逾《最有利標評選辦法》§16/§17 之 50% 上限（且非固定價格案），須調整至 20%–50%；給可貼用修正；findings 在前、summary 在後，不以『其餘齊全』稀釋 Blocker。",
+      "files": [],
+      "expectations": [
+        "進入 review 模式並機械初篩",
+        "回報 [Blocker] 價格權重逾 50%（非固定價格案）",
+        "引用最有利標評選辦法 §16/§17 之 20%–50% 區間",
+        "不因『其餘章節齊全』而稀釋 Blocker 結論"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "write-info-service-cost-plus-zh",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "gov-procurement",
+        "happy-path"
+      ],
+      "prompt": "我們機關要委外一個性質很複雜、成果還不太確定的資訊系統研究與雛形開發案，採政府採購。費用很難事先精算，請幫我寫 RFP，特別是計費方式要怎麼訂。",
+      "expected_output": "write 模式產出 RFP 草稿，計費章節因『成果不確定』建議採『服務成本加公費法』，並載明公費 ≤25%、管理費 ≤100% 等法定上限；同時提醒價格配分（若納入評選）落在 20%–50% 區間。",
+      "files": [],
+      "expectations": [
+        "辨識為 write 模式並對齊『成果不確定 → 服務成本加公費法』",
+        "草稿載明公費 ≤25%、管理費 ≤100% 之法定上限",
+        "提及價格配分 20%–50% 法定區間或固定價格例外"
       ]
     }
   ]

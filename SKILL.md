@@ -1,7 +1,7 @@
 ---
 name: rfp-architect
-description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬、變更管理與退場返還）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
-version: 2026.6.15
+description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬、變更管理與退場返還、價格配分與計費合規）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
+version: 2026.6.16
 metadata:
   author: "Openclaw-Metis"
 ---
@@ -53,7 +53,7 @@ Successful output:
 - Expected result：依嚴重度分級的 findings＋summary＋優先修正順序
 
 3) **RFP 知識諮詢（輕量）**
-- Trigger examples：「委外 RFP 評選怎麼設計」「序位法怎麼算」「資安條款怎麼寫」「RFP 的變更管理 / 退場條款怎麼寫」
+- Trigger examples：「委外 RFP 評選怎麼設計」「序位法怎麼算」「資安條款怎麼寫」「RFP 的變更管理 / 退場條款怎麼寫」「價格權重佔比上限是多少」「資訊服務委外怎麼計費」
 - Required inputs：具體問題
 - Expected result：依知識庫回答，必要時引導進 write / review
 
@@ -98,9 +98,9 @@ Qualitative:
 
 <workflow>
 Step 0: 判定模式並蒐集輸入
-- Action:先讀對話與附件，判定是 write（要產出 RFP）還是 review（要審查既有 RFP）；若意圖不明，問一題確認。write 缺關鍵輸入（標的、是否政府採購、預算範圍）時補問 1–3 題；review 未提供待審文件時請對方貼上或給路徑。
+- Action:先讀對話與附件，判定是 write（要產出 RFP）還是 review（要審查既有 RFP）；若意圖不明，問一題確認。write 缺關鍵輸入（標的、是否政府採購、預算範圍）時補問 1–3 題；review 未提供待審文件時請對方貼上或給路徑。**並判定採購軌道**：政府機關 / 公法人 / 受《政府採購法》拘束者走「政府採購軌」（強制檢查最有利標、評選委員會、等標期、價格 20–50% 權重、資訊服務計費辦法）；一般企業走「企業委外軌」（聚焦商業條款、SLA、智財、資安、個資 / 資料處理、付款與退場，不硬套政府採購法術語）；不確定時以「政府 / 公法人 / 受採購法拘束 / 一般企業」四選一釐清。
 - Input:使用者請求、附帶檔案、`references/rfp-anatomy.md`（文件家族判定 RFP / RFI / RFQ / SOW）。
-- Output:確定模式（write / review）＋已確認輸入清單，或缺漏待補清單（stop condition）。
+- Output:確定模式（write / review）＋採購軌道（政府 / 企業）＋已確認輸入清單，或缺漏待補清單（stop condition）。
 - Validation:模式必須為 write 或 review 其一；一旦標的其實該用 RFQ 或屬契約談判，就停止並改建議正確路徑，不硬產 RFP。
 
 Step W1（write）: 載入知識庫並完成需求鎖定
@@ -110,16 +110,16 @@ Step W1（write）: 載入知識庫並完成需求鎖定
 - Validation:每條納入草稿的功能需求都要可對應一個驗收標準；做不到的標記「待確認」，不得假裝完整。
 
 Step W2（write）: 套用骨架產出 RFP 草稿
-- Action:以 `assets/templates/rfp-skeleton.md` 為骨架，逐節填實 11 章節；政府採購案套用 `taiwan-procurement.md` 設計招標 / 決標 / 評選配分與評選委員會；依標的從 `clause-library.md` 貼入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬、變更管理流程、退場 / 資料返還等在地與契約條款。
+- Action:以 `assets/templates/rfp-skeleton.md` 為骨架，逐節填實 11 章節；政府採購案套用 `taiwan-procurement.md` 設計招標 / 決標 / 評選配分與評選委員會；依標的從 `clause-library.md` 貼入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬、變更管理流程、退場 / 資料返還、計費方式等在地與契約條款；資訊服務政府採購案另依 `taiwan-procurement.md` §8 對照《機關委託資訊服務廠商評選及計費辦法》之法定應載事項，並確認價格配分落在 20%–50% 法定區間。
 - Input:Step W1 需求清單、骨架模板、條款庫。
 - Output:填實的 RFP 草稿（zh-TW），凡 `【填入：…】` 必須補實或標記「不適用＋原因」。
-- Validation:不得保留空節或未說明的 `【填入】`；評選章節必含配分與決標方式；政府採購案必含合法評選委員會組成。
+- Validation:不得保留空節或未說明的 `【填入】`（`rfp_lint.py` 占位符規則會擋）；評選章節必含配分與決標方式；政府採購案必含合法評選委員會組成、價格 20–50% 權重，並於文件標註「法規版本 / 查核日期 / 待法務確認」（host 不允許即時查核時，不得宣稱為最新法規，僅標示依內建版本整理、發包前以官方最新版確認）。
 
 Step W3（write）: 自我檢核
-- Action:對草稿執行 `python3 scripts/rfp_lint.py <draft> --json`，修正所有 Blocker 缺漏；再以 `references/review-rubric.md` 自審一輪一致性。
+- Action:對草稿執行 `python3 scripts/rfp_lint.py <draft> --json`，修正所有 Blocker 章節缺漏**與規則違規（占位符未填、簡報 > 20%、價格不在 20–50%、配分合計非 100%）**；再以 `references/review-rubric.md` 自審一輪一致性。
 - Input:草稿、`scripts/rfp_lint.py`、`references/review-rubric.md`。
-- Output:通過 lint（無 Blocker）的最終草稿＋一句覆蓋率說明。
-- Validation:一旦 lint 回報任何 Blocker 缺漏，就必須補齊後再返回，不得交付帶 Blocker 的草稿。
+- Output:通過 lint（無 Blocker 缺漏、無規則違規）的最終草稿＋一句覆蓋率說明。
+- Validation:一旦 lint 回報任何 Blocker 缺漏或規則違規（含占位符殘留），就必須補齊 / 修正後再返回，不得交付帶 Blocker 的草稿。
 
 Step R1（review）: 機械初篩
 - Action:讀取待審 RFP 全文，理解其標的與採購情境；執行 `python3 scripts/rfp_lint.py <file> --json` 取得缺漏的章節 / 條款清單。
@@ -128,7 +128,7 @@ Step R1（review）: 機械初篩
 - Validation:lint 結果只作初篩訊號；命中關鍵字不代表品質足夠，仍須進 Step R2 逐項判定。
 
 Step R2（review）: 套用 rubric 逐項判定
-- Action:載入 `references/review-rubric.md`，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；對台灣政府採購案，特別檢查評選配分揭露、評選委員會合法性、資安分級、智財歸屬、驗收標準、變更管理流程與退場 / 資料返還條款。
+- Action:載入 `references/review-rubric.md`，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；對台灣政府採購案，特別檢查評選配分揭露、價格配分是否落在 20%–50% 法定區間（固定價格案除外）、評選委員會合法性、資安分級、智財歸屬（含分包著作權鏈條）、驗收標準、變更管理流程與退場 / 資料返還條款。
 - Input:待審 RFP、初篩結果、rubric、必要時 `taiwan-procurement.md`、`clause-library.md`。
 - Output:findings 清單，每項含 [嚴重度] 位置、為什麼重要、可貼用修正建議。
 - Validation:每個 Blocker / Major 都必須有定位與具體可貼用修正，不得只給泛泛批評。
@@ -187,8 +187,8 @@ Input:
 
 Output:
 - 一行確認：「write 模式｜線上申辦系統委外 RFP（政府採購 / 最有利標，預算約 800 萬）」。
-- 依 11 章節產出草稿：業務背景與量化目標、工作範疇（含 / 不含）、功能需求表（必要 / 應有 / 加分＋驗收標準）、非功能門檻（可用率 99.9%）、資安分級（中 / 高）＋禁陸製＋資料落地＋繁中在地化、SLA 與罰則、評選配分表（技術 / 功能 / 管理 / 價格 / CSR）＋序位法＋評選委員會 5 人以上外聘 1/3、預算時程與等標期、契約 / 驗收 / 著作權歸屬選項 / 保固 / 變更管理流程 / 退場與資料返還 / 投標須知。
-- 一行：lint 19/19、0 Blocker；待確認：罰則級距、保固月數。
+- 依 11 章節產出草稿：業務背景與量化目標、工作範疇（含 / 不含）、功能需求表（必要 / 應有 / 加分＋驗收標準）、非功能門檻（可用率 99.9%）、資安分級（中 / 高）＋禁陸製＋資料落地＋繁中在地化、SLA 與罰則、評選配分表（技術 / 功能 / 管理 / 價格 / CSR，價格落在 20%–50% 法定區間）＋序位法＋評選委員會 5 人以上外聘 1/3、預算時程與等標期、計費方式（總包價 / 計時 / 成本加公費）、契約 / 驗收 / 著作權歸屬選項（含分包鏈條）/ 保固 / 變更管理流程 / 退場與資料返還 / 投標須知。
+- 一行：lint 20/20、0 Blocker；待確認：罰則級距、保固月數。
 
 Example 2（review）
 Input:
@@ -300,10 +300,11 @@ Output:
 
 - `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用）。
 - `references/rfp-anatomy.md`：文件家族與 11 必備章節、需求工程、撰寫流程。
-- `references/taiwan-procurement.md`：招標 / 決標 / 異質採購 / 最有利標 / 評選委員會 / 序位法 / 等標期。
-- `references/clause-library.md`：台灣在地與契約條款庫（資安 / 禁用 / 資料落地 / 在地化 / 智財 / 保固 / 變更管理 / 退場返還 / 治理盡職調查）。
+- `references/taiwan-procurement.md`：招標 / 決標 / 異質採購 / 最有利標 / 評選委員會 / 三種評定方式 / 序位法 / 等標期 / 價格 20–50% 區間 / 資訊服務委外專法（§8）。
+- `references/clause-library.md`：台灣在地與契約條款庫（資安 / 禁用 / 資料落地 / 在地化 / 智財含分包鏈條 / 保固 / 變更管理 / 退場返還 / 治理盡職調查 / 計費方式）。
 - `references/review-rubric.md`：審查心法、審查清單、嚴重度、八大常見錯誤、失敗根因、finding 格式。
-- `assets/templates/rfp-skeleton.md`：write 模式的填空骨架。
+- `references/case-patterns.md`：委外失敗模式 → RFP 控制點對照（強化 review finding 的「為什麼重要」；公開案例，非報告內容）。
+- `assets/templates/rfp-skeleton.md`：write 模式的填空骨架（含法規版本標頭與 RTM / 交付 / 付款管理矩陣）。
 - `references/readiness_report.md`：發版證據（必備）。
 - `references/checklist_template.md`：人工 review notes 模板（非 release gate）。
 - `references/migration-governance.md`：rename / deprecate / merge / split 相容性規則。

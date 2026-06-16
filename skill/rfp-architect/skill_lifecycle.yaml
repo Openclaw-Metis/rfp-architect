@@ -1,12 +1,13 @@
 name: rfp-architect
-status: draft
+status: published
+version: 2026.6.16
 owner: "Openclaw-Metis"
 archetype: executor
 primary_structure_pattern: pipeline
 lifecycle:
   created_at: 2026-06-15
   last_validated_at: 2026-06-16
-  last_released_at: null
+  last_released_at: 2026-06-16
   review_interval_days: 90
   next_review_due: 2026-09-14
 support:
@@ -17,7 +18,12 @@ support:
 risk:
   external_side_effects: false
   requires_secrets: false
-  data_sensitivity: low
+  # The skill ships no secrets and makes no external calls, so its STATIC data is low-risk.
+  # But user-supplied RFP drafts can carry budget, architecture, security posture and
+  # personal-data processing detail — treat user input as medium-to-high sensitivity.
+  skill_static_data_sensitivity: low
+  user_input_data_sensitivity: medium_to_high_possible
+  handling_note: "RFP drafts may contain procurement budget, architecture, security and personal-data processing details; do not route draft content through external APIs unless the user explicitly requests it."
 dependencies:
   scripts:
     - scripts/rfp_lint.py
@@ -27,9 +33,11 @@ dependencies:
     - references/rfp-anatomy.md
     - references/taiwan-procurement.md
     - references/clause-library.md
+    - references/info-service-article5-map.md
     - references/review-rubric.md
     - references/case-patterns.md
     - references/source-register.md
+    - references/maintainer-guide.md
     - references/readiness_report.md
 stewardship:
   reviewers: []

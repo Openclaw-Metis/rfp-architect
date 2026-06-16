@@ -28,8 +28,7 @@ Substantive changes:
 - Blocking issues for local draft use:
   - None found after this pass.
 - Remaining publish requirements:
-  - Current release metadata uses `f80f3bcce0833ea8152cc7d509edd2c98a434739+dirty` because this optimization has not been committed.
-  - The release benchmark is a local smoke benchmark, not a full instrumented paired benchmark; baseline figures are carried from the prior smoke benchmark for gate compatibility and were not rerun in this pass.
+  - The release benchmark is a local smoke benchmark, not a full instrumented paired benchmark; baseline figures are carried from the prior smoke benchmark for gate compatibility and were not rerun in this pass. Source commit: `86b7c52ca2ec957445a36f340fe0adcefd36eb9c`.
 
 ## Evidence / commands run
 

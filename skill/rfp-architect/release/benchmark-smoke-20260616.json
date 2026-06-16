@@ -4,7 +4,7 @@
   "note": "pass_rate is measured by rfp_lint against examples/starter/output.md; high-risk legal/compliance regressions are covered by scripts/rfp_lint_selftest.py. Baseline figures are carried from the prior single-task smoke benchmark for gate compatibility and were not rerun in this local optimization pass; run a full paired benchmark before registry publication.",
   "metadata": {
     "skill_version": "2026.6.16",
-    "git_commit": "f80f3bcce0833ea8152cc7d509edd2c98a434739+dirty",
+    "git_commit": "86b7c52ca2ec957445a36f340fe0adcefd36eb9c",
     "host": "codex-desktop/local",
     "model": "gpt-5-codex",
     "temperature": 1.0,

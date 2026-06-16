@@ -331,6 +331,137 @@
         "不要求政府評選委員會或等標期",
         "不把企業價格配分當政府採購法違規"
       ]
+    },
+    {
+      "id": 17,
+      "name": "adversarial-gov-committee-missing-blocker",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement",
+        "adversarial",
+        "regression"
+      ],
+      "prompt": "幫我審查這份政府機關資訊系統最有利標 RFP。技術、功能、價格配分都齊全且合計 100%，但全文沒有提到採購評選委員會的組成或評選方式。可以發布嗎？",
+      "expected_output": "回報 [Blocker] 政府最有利標案缺評選委員會組成 / 評選方式（依《採購評選委員會組織準則》5 人以上、外聘 ≥1/3、召集人一級主管以上）；不得因其他章節齊備而放行。rfp_lint --track government 對缺 committee 之最有利標案回報 Blocker。",
+      "files": [],
+      "expectations": [
+        "政府最有利標案缺評選委員會被判 Blocker（非 Minor）",
+        "引用採購評選委員會組織準則之組成要件",
+        "結論不得為 PASS"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "adversarial-gov-sensitive-exit-missing-blocker",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement",
+        "adversarial",
+        "regression"
+      ],
+      "prompt": "審查這份政府委外案 RFP：系統會處理大量民眾個資，章節大致齊全，但完全沒有退場、資料返還或刪除/銷毀證明的條款。",
+      "expected_output": "回報 [Blocker] 涉個資之資料委外案缺退場 / 資料返還 / 刪除銷毀條款（易被廠商以資料綁架、且違個資法委託處理安全維護義務）；給可貼用 clause-library.md J/M 條款。rfp_lint 在偵測到個資 / 雲端 / 關鍵系統時，將缺 exit 升為 Blocker。",
+      "files": [],
+      "expectations": [
+        "涉個資 / 敏感資料時缺退場返還被判 Blocker（非 Minor）",
+        "連結個資法委託處理與資料綁架風險",
+        "給可貼用返還 / 刪除銷毀條款"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "adversarial-security-out-of-scope-negation",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "adversarial",
+        "edge-case"
+      ],
+      "prompt": "審查這份 RFP，它的資安章節只寫了一句「本案不處理資通安全需求，由機關自行負責」。其餘章節都有。",
+      "expected_output": "不可因『資安』關鍵字命中就視為已具備；指出資安章節實質為『不處理 / 不適用』，對政府或涉個資案屬重大缺漏，要求補資安分級與對應控制。rfp_lint v6 會以 out_of_scope_mention 警示（advisory），但最終由 rubric 判定嚴重度。",
+      "files": [],
+      "expectations": [
+        "辨識 keyword 命中但章節實為 out-of-scope",
+        "不被『資安』字面命中誤導為已具備",
+        "對政府 / 涉個資案要求補實資安分級"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "adversarial-ip-keyword-no-attribution",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "adversarial"
+      ],
+      "prompt": "這份 RFP 第十一章有寫到「智慧財產權」四個字，但只說『智財事項另行約定』，沒有給歸屬選項。幫我看有沒有問題。",
+      "expected_output": "回報 [Blocker] 智財僅提及未約定歸屬（機關取得 / 廠商享有＋授權）與素材授權、分包著作權鏈條；『另行約定』形同未約定，易生決標後爭議；給 clause-library.md G 可勾選條款。",
+      "files": [],
+      "expectations": [
+        "『智財另行約定』不被當成已具備智財歸屬",
+        "要求可勾選歸屬選項與分包著作權鏈條",
+        "判為 Blocker"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "adversarial-functional-no-acceptance",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "adversarial"
+      ],
+      "prompt": "審查這份 RFP：功能需求列了一長串，但每條都沒有對應的驗收標準或可測試條件。",
+      "expected_output": "回報 [Blocker] 功能需求缺可驗收標準——寫不出驗收標準的需求＝還沒想清楚的需求，必在驗收階段引爆爭議；要求每條功能需求對應一個可測試驗收標準（RTM）。",
+      "files": [],
+      "expectations": [
+        "缺驗收標準的功能需求被判 Blocker",
+        "引用『可驗收性貫穿生命週期』根因",
+        "要求需求↔驗收標準對應（RTM）"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "adversarial-ai-system-rfp-poc-clauses",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "write",
+        "should-trigger",
+        "gov-procurement",
+        "adversarial",
+        "ai-procurement"
+      ],
+      "prompt": "幫我寫一份政府機關「生成式 AI 客服與民眾問答系統」的委外 RFP，採政府採購。要能應付 AI 特有的風險。",
+      "expected_output": "write 模式產出 11 章節草稿，並依 clause-library.md O（AI 系統條款）納入：結構化 PoC / 付費技術評估、模型版本與更新通知、測試資料集與評估指標、幻覺 / 錯誤率量測與人工覆核、輸入資料是否用於訓練、prompt / log 保存、bias / fairness / explainability；評選須有一致評估量表；提醒 AI 採購不確定性宜採 PoC 後再進入完整開發。",
+      "files": [],
+      "expectations": [
+        "納入結構化 PoC / 技術評估再進入完整開發",
+        "納入幻覺 / 錯誤率、人工覆核、訓練資料使用、log 保存等 AI 條款",
+        "評選含一致評估量表，且不臆造模型效能數值"
+      ]
     }
   ]
 }

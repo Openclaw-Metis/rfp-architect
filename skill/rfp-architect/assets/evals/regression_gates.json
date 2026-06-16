@@ -1,7 +1,6 @@
 {
   "min_pass_rate_delta": 0.0,
-  "max_time_increase_seconds": 30.0,
-  "max_token_increase": 5000,
+  "deterministic_functional_pass_rate": 1.0,
   "require_non_negative_pass_rate": true,
   "required_eval_tags": [
     "should-trigger",
@@ -9,13 +8,22 @@
     "near-miss",
     "happy-path",
     "edge-case",
-    "failure-mode"
+    "failure-mode",
+    "adversarial"
   ],
   "required_eval_languages": ["zh", "en", "mixed"],
   "required_rule_regressions": [
     "gov-price-over-50-fails",
     "gov-fixed-price-under-20-info",
     "enterprise-track-no-gov-price-rule",
-    "weight-sum-not-100-fails"
+    "weight-sum-not-100-fails",
+    "gov-mat-committee-missing-blocker",
+    "gov-sensitive-exit-missing-blocker",
+    "out-of-scope-negation-advisory",
+    "prohibition-not-flagged-as-negation"
+  ],
+  "notes": [
+    "deterministic_functional_pass_rate is enforced by scripts/rfp_lint_selftest.py (15 cases) plus the starter example_lint and skeleton expected-fail; this is the release gate for a knowledge+linter skill.",
+    "max_time_increase_seconds / max_token_increase were retired in 2026.6.16: they assumed a paired LLM latency benchmark that was never instrumented for this artifact type (see references/readiness_report.md)."
   ]
 }

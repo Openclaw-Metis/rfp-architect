@@ -2,12 +2,24 @@
 """
 rfp_lint.py — deterministic linter for an RFP (建議書徵求說明書) draft.
 
-Two layers:
+Three layers:
 1) Completeness (keyword-based): does the draft mention every mandatory section /
    Taiwan-specific clause? Presence ≠ quality — a HIT still needs rubric review.
-2) Compliance rules (regex-based, V4): catches a class of HIGH-RISK errors that a
+   V6 also returns evidence (line number, matched keyword, nearest heading) so a
+   review can cite WHERE a section is, not just whether it is present.
+2) Compliance rules (regex-based): catches a class of HIGH-RISK errors that a
    keyword check cannot — leftover placeholders, price weight outside the statutory
    20%–50% band, simulation weight over 20%, and評選 weights not summing to 100%.
+3) Context-aware signals (V6):
+   - Out-of-scope negation: a keyword that appears only inside a「不處理 / 不適用」
+     context is surfaced as an ADVISORY warning (never a hard fail), because a
+     keyword linter cannot safely tell prescriptive prohibitions (e.g.「不得使用
+     大陸製品」, which is a legitimate clause) from genuine absence. The rubric makes
+     the call.
+   - Track-specific severity: 評選委員會 / 退場返還 / 禁用清單 / 資料落地 carry far
+     more weight in a government 最有利標 / 資訊服務 case (and when 個資 / 雲端 /
+     關鍵系統 are in play) than in a generic enterprise RFP, so their MISSING
+     severity is escalated accordingly.
 
 Used by both modes:
 - write mode: self-check a generated draft before returning it.
@@ -25,9 +37,9 @@ import json
 import re
 import sys
 
-GRADER_VERSION = "rfp_lint-5"
+GRADER_VERSION = "rfp_lint-6"
 
-# ---- Layer 1: completeness (key, label, severity, [keywords; any match = present]) ----
+# ---- Layer 1: completeness (key, label, base_severity, [keywords; any match = present]) ----
 CHECKS = [
     ("summary",    "執行摘要 / 專案願景",      "minor",   ["執行摘要", "專案願景", "願景", "summary", "vision"]),
     ("background", "業務背景與目標",            "major",   ["背景", "目標", "痛點", "現狀", "objective", "background"]),
@@ -59,8 +71,77 @@ _PLACEHOLDERS = ["【填入", "【__", "__%", "待補", "TODO", "xxx%", "XX%"]
 # integer percentage, excluding decimals like 99.9% (lookbehind rejects a preceding digit or dot)
 _INT_PCT = re.compile(r"(?<![\d.])(\d{1,3})\s*%(?!\.\d)")
 
+# Out-of-scope negation: a section TOPIC declared absent / not handled. Deliberately
+# excludes 「不包含」 (a legitimate scope-exclusion keyword) and prescriptive 不得/禁止
+# prohibitions (guarded separately) to avoid flagging valid clauses.
+_OUT_OF_SCOPE = re.compile(r"(不處理|未處理|不涉及|未涉及|不適用|無需求|無此需求|無相關需求|未規劃|尚未規劃|從缺|無須處理)")
+_PROHIBITION = re.compile(r"(不得|禁止|不可|嚴禁)")
 
-def _eval_section(text: str) -> str:
+# Markers that raise the stakes for data-return / residency / committee clauses.
+_SENSITIVE_MARKERS = ("個資", "個人資料", "personal data", "關鍵基礎設施",
+                      "關鍵資訊基礎設施", "關鍵系統", "雲端", "cloud")
+# Most-advantageous-tender / information-service procurement context.
+_MAT_MARKERS = ("最有利標", "資訊服務", "機關委託資訊服務", "評選委員會")
+
+
+def _heading_map(lines):
+    """For each line index, the text of the nearest preceding markdown heading."""
+    out = []
+    current = ""
+    for ln in lines:
+        if ln.lstrip().startswith("#"):
+            current = ln.lstrip("#").strip()
+        out.append(current)
+    return out
+
+
+def _find_first(lines, head_map, keywords):
+    """Return (line_no_1based, matched_keyword, heading) for the first keyword hit."""
+    for i, ln in enumerate(lines):
+        low = ln.lower()
+        for kw in keywords:
+            if kw.lower() in low:
+                return (i + 1, kw, head_map[i])
+    return None
+
+
+def _negation_hit(lines, keywords):
+    """If a keyword appears on a line that declares the topic out-of-scope (and is not a
+    prescriptive 不得/禁止 prohibition), return (line_no_1based, evidence_excerpt)."""
+    for i, ln in enumerate(lines):
+        low = ln.lower()
+        if not any(kw.lower() in low for kw in keywords):
+            continue
+        if _OUT_OF_SCOPE.search(ln) and not _PROHIBITION.search(ln):
+            excerpt = ln.strip()
+            if len(excerpt) > 60:
+                excerpt = excerpt[:57] + "…"
+            return (i + 1, excerpt)
+    return None
+
+
+def _effective_severity(key, base, track, sensitive, mat_context):
+    """Escalate MISSING severity for clauses that matter more in government / sensitive cases."""
+    if key == "committee":
+        if track == "government":
+            return "blocker" if mat_context else "major"
+        return base  # enterprise: a 評選委員會 is not required
+    if key == "exit":
+        if sensitive:
+            return "blocker"  # outsourced data with no return/erase clause is a real trap
+        if track == "government":
+            return "major"
+        return base
+    if key == "banlist":
+        return "major" if track == "government" else base
+    if key == "locale":
+        if track == "government" and sensitive:
+            return "blocker"
+        return base  # already major
+    return base
+
+
+def _eval_section(text):
     """Return the 評選/配分 section (heading contains 評選 + 配分/權重/標準) up to the next heading."""
     lines = text.splitlines()
     start = None
@@ -78,7 +159,7 @@ def _eval_section(text: str) -> str:
     return "\n".join(out)
 
 
-def _label_pct(blob: str, label_re: str):
+def _label_pct(blob, label_re):
     """First integer percentage appearing right after a label within the same line/run."""
     vals = []
     for m in re.finditer(label_re + r"[^%\d\n]{0,12}?(\d{1,3})\s*%", blob):
@@ -86,7 +167,7 @@ def _label_pct(blob: str, label_re: str):
     return vals
 
 
-def _detect_track(text: str, requested: str) -> str:
+def _detect_track(text, requested):
     """Infer whether Taiwan government procurement rules should apply."""
     if requested != "auto":
         return requested
@@ -104,13 +185,13 @@ def _detect_track(text: str, requested: str) -> str:
     return "unknown"
 
 
-def _detect_fixed_price(text: str, forced: bool) -> bool:
+def _detect_fixed_price(text, forced):
     if forced:
         return True
     return any(k in text for k in ("固定價格", "固定費用", "固定服務費用", "固定費率", "預算已定案", "預算確定"))
 
 
-def rule_checks(text: str, track: str = "auto", fixed_price: bool = False):
+def rule_checks(text, track="auto", fixed_price=False):
     """Layer 2: regex compliance rules. Returns list of findings."""
     findings = []
     effective_track = _detect_track(text, track)
@@ -173,29 +254,62 @@ def rule_checks(text: str, track: str = "auto", fixed_price: bool = False):
     return findings
 
 
-def lint(text: str, track: str = "auto", fixed_price: bool = False):
+def lint(text, track="auto", fixed_price=False):
+    lines = text.splitlines()
     low = text.lower()
-    present, missing = [], []
-    for key, label, sev, kws in CHECKS:
-        hit = any(k.lower() in low for k in kws)
-        (present if hit else missing).append({"key": key, "label": label, "severity": sev})
+    eff_track = _detect_track(text, track)
+    sensitive = any(m.lower() in low for m in _SENSITIVE_MARKERS)
+    mat_context = any(m in text for m in _MAT_MARKERS)
+    head_map = _heading_map(lines)
+
+    checks_out, missing, weak_hits = [], [], []
+    present_count = 0
+    for key, label, base_sev, kws in CHECKS:
+        eff_sev = _effective_severity(key, base_sev, eff_track, sensitive, mat_context)
+        loc = _find_first(lines, head_map, kws)
+        if loc:
+            present_count += 1
+            line_no, matched, heading = loc
+            entry = {"key": key, "label": label, "status": "present", "severity": eff_sev,
+                     "line": line_no, "matched": matched, "heading": heading}
+            neg = _negation_hit(lines, kws)
+            if neg:
+                entry["status"] = "weak_hit"
+                entry["evidence_line"] = neg[0]
+                entry["evidence"] = neg[1]
+                weak_hits.append({"key": key, "label": label, "line": neg[0], "evidence": neg[1]})
+            checks_out.append(entry)
+        else:
+            missing.append({"key": key, "label": label, "severity": eff_sev})
+            checks_out.append({"key": key, "label": label, "status": "missing", "severity": eff_sev})
+
     missing.sort(key=lambda m: SEV_RANK[m["severity"]])
     blockers = [m for m in missing if m["severity"] == "blocker"]
+
     rules = rule_checks(text, track=track, fixed_price=fixed_price)
+    for w in weak_hits:
+        rules.append({
+            "rule": "out_of_scope_mention", "severity": "warning", "key": w["key"], "line": w["line"],
+            "message": f"『{w['label']}』關鍵字出現在疑似『不處理 / 不適用』語境（第 {w['line']} 行：{w['evidence']}）；命中不代表章節具備，請人工複核。"
+        })
     rule_block = [r for r in rules if r["severity"] in ("blocker", "major")]
-    score = round(100 * len(present) / len(CHECKS))
+
+    score = round(100 * present_count / len(CHECKS))
     ok = (len(blockers) == 0) and (len(rule_block) == 0)
     return {
         "total_checks": len(CHECKS),
-        "present": len(present),
+        "present": present_count,
         "coverage_pct": score,
+        "checks": checks_out,
         "missing": missing,
         "missing_blockers": [m["label"] for m in blockers],
+        "weak_hits": [w["label"] for w in weak_hits],
         "rule_findings": rules,
         "rule_violations": len(rule_block),
         "rule_warnings": len([r for r in rules if r["severity"] == "warning"]),
         "rule_infos": len([r for r in rules if r["severity"] == "info"]),
-        "effective_track": _detect_track(text, track),
+        "effective_track": eff_track,
+        "sensitive_context": sensitive,
         "grader_version": GRADER_VERSION,
         "pass": ok,
     }
@@ -222,9 +336,9 @@ def main():
             tail = f"｜⚠ {res['rule_warnings']} 項合規風險待確認"
         if res["pass"] and res["rule_infos"]:
             tail += f"｜ℹ {res['rule_infos']} 項說明"
-        print(f"RFP 完整度：{res['present']}/{res['total_checks']} 章節 ({res['coverage_pct']}%)  {verdict}{tail}")
+        print(f"RFP 完整度：{res['present']}/{res['total_checks']} 章節 ({res['coverage_pct']}%)  軌道={res['effective_track']}  {verdict}{tail}")
         if res["missing"]:
-            print("章節缺漏：")
+            print("章節缺漏（嚴重度已依採購軌道 / 敏感度調整）：")
             for m in res["missing"]:
                 print(f"  [{m['severity'].upper()}] {m['label']}")
         if res["rule_findings"]:

@@ -1,0 +1,79 @@
+{
+  "skill_name": "rfp-architect",
+  "version": "2026.6.25",
+  "status": "PASS",
+  "generated_at": "2026-06-25T00:00:00+08:00",
+  "commit": "ea6ebc068f2bdfbcbc6d0ebfa160bc6e2126d735",
+  "checks": {
+    "format": "PASS",
+    "structure": "PASS",
+    "workflow_contract": "PASS",
+    "lifecycle": "PASS",
+    "lifecycle_state": "PASS",
+    "eval_json": "PASS",
+    "trigger_eval_json": "PASS",
+    "rfp_lint_selftest": "PASS",
+    "example_lint": "PASS",
+    "skeleton_placeholder_guard": "PASS",
+    "release_evidence_traceability": "PASS",
+    "legal_freshness_live_verified": "INHERITED 2026-06-16 (sources unchanged this release; re-verify by 2026-09-23)"
+  },
+  "benchmark": {
+    "path": "release/benchmark-smoke-20260625.json",
+    "embedded_summary": true
+  },
+  "benchmark_summary": {
+    "artifact_type": "benchmark-summary",
+    "source_path": "release/benchmark-smoke-20260625.json",
+    "source_sha256": "0c34bba096eb3f78d6d7e467347c5b6bc6995ec8eea4ec31fed8528e5c9adb18",
+    "metadata": {
+      "skill_version": "2026.6.25",
+      "git_commit": "ea6ebc068f2bdfbcbc6d0ebfa160bc6e2126d735",
+      "host": "openclaw/local",
+      "grader_version": "rfp_lint-7",
+      "run_timestamp": "2026-06-25T00:00:00+08:00",
+      "gate_type": "deterministic-functional"
+    },
+    "results": {
+      "deterministic_functional_pass_rate": 1.0,
+      "rfp_lint_selftest": {
+        "status": "PASS",
+        "cases": 17
+      },
+      "example_output_lint": {
+        "status": "PASS",
+        "coverage": "20/20",
+        "rule_violations": 0,
+        "track": "government"
+      },
+      "skeleton_placeholder_lint": {
+        "status": "EXPECTED_FAIL",
+        "reason": "raw template must not pass as a finished RFP"
+      },
+      "release_evidence_audit": {
+        "status": "PASS"
+      },
+      "eval_json_valid": {
+        "status": "PASS"
+      },
+      "eval_suite": {
+        "task_evals": 22,
+        "trigger_evals": 10,
+        "adversarial_evals": 6
+      },
+      "held_out_final_test": {
+        "status": "PASS",
+        "cases": 6,
+        "note": "distinct from the 2 selftest regression guards; no new false positive/negative"
+      }
+    },
+    "notes": [
+      "rfp-architect is knowledge + a deterministic Python linter; its release gate is the deterministic functional suite above. There is no LLM inference in the gated path, so latency/token deltas are not instrumented for this artifact type. See references/readiness_report.md.",
+      "2026.6.25 (rfp_lint-7) is a SkillOpt-style optimization pass on the scorer: row-aware eval-table parsing fixes a verbose-price-label false negative (price/simulation cap) and a threshold-row weight-sum false positive. SKILL.md / routing / references / task evals unchanged.",
+      "Legal sources were NOT re-verified live in this release; they are inherited from the 2026-06-16 live verification against 全國法規資料庫 and are unchanged. Re-verify by next_review_due 2026-09-23."
+    ]
+  },
+  "benchmark_summary_path": "release/benchmark-summary-2026.6.25.json",
+  "blocking_findings": [],
+  "remaining_publish_requirements": []
+}

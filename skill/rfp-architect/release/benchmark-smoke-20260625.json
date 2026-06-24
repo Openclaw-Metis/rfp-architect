@@ -1,0 +1,50 @@
+{
+  "skill": "rfp-architect",
+  "artifact_type": "deterministic-functional-gate",
+  "scope": "Deterministic functional gate for a knowledge + linter skill. NOT a paired with-skill/baseline LLM latency/cost benchmark.",
+  "metadata": {
+    "skill_version": "2026.6.25",
+    "host": "openclaw/local",
+    "grader_version": "rfp_lint-7",
+    "run_timestamp": "2026-06-25T00:00:00+08:00",
+    "legal_sources_verified": "INHERITED 2026-06-16 (A0030080 114/01/21, A0030078 114/05/23, A0030103 115/05/08); unchanged this release; re-verify by 2026-09-23"
+  },
+  "results": {
+    "deterministic_functional_pass_rate": 1.0,
+    "rfp_lint_selftest": {
+      "status": "PASS",
+      "cases": 17
+    },
+    "example_output_lint": {
+      "status": "PASS",
+      "coverage": "20/20",
+      "rule_violations": 0,
+      "track": "government"
+    },
+    "skeleton_placeholder_lint": {
+      "status": "EXPECTED_FAIL",
+      "reason": "raw template must not pass as a finished RFP"
+    },
+    "release_evidence_audit": {
+      "status": "PASS"
+    },
+    "eval_json_valid": {
+      "status": "PASS"
+    },
+    "eval_suite": {
+      "task_evals": 22,
+      "trigger_evals": 10,
+      "adversarial_evals": 6
+    },
+    "held_out_final_test": {
+      "status": "PASS",
+      "cases": 6,
+      "note": "distinct from the 2 selftest regression guards; no new false positive/negative"
+    }
+  },
+  "notes": [
+    "rfp-architect is knowledge + a deterministic Python linter; its release gate is the deterministic functional suite above. There is no LLM inference in the gated path, so latency/token deltas are not instrumented for this artifact type. See references/readiness_report.md.",
+    "2026.6.25 (rfp_lint-7) is a SkillOpt-style optimization pass on the scorer: row-aware eval-table parsing fixes a verbose-price-label false negative (price/simulation cap) and a threshold-row weight-sum false positive. SKILL.md / routing / references / task evals unchanged.",
+    "Legal sources were NOT re-verified live in this release; they are inherited from the 2026-06-16 live verification against 全國法規資料庫 and are unchanged. Re-verify by next_review_due 2026-09-23."
+  ]
+}

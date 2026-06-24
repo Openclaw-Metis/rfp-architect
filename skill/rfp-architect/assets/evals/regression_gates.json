@@ -20,10 +20,12 @@
     "gov-mat-committee-missing-blocker",
     "gov-sensitive-exit-missing-blocker",
     "out-of-scope-negation-advisory",
-    "prohibition-not-flagged-as-negation"
+    "prohibition-not-flagged-as-negation",
+    "verbose-price-label-over-50-fails",
+    "threshold-row-not-counted-in-weight-sum"
   ],
   "notes": [
-    "deterministic_functional_pass_rate is enforced by scripts/rfp_lint_selftest.py (15 cases) plus the starter example_lint and skeleton expected-fail; this is the release gate for a knowledge+linter skill.",
+    "deterministic_functional_pass_rate is enforced by scripts/rfp_lint_selftest.py (17 cases; rfp_lint-7) plus the starter example_lint and skeleton expected-fail; this is the release gate for a knowledge+linter skill.",
     "max_time_increase_seconds / max_token_increase were retired in 2026.6.16: they assumed a paired LLM latency benchmark that was never instrumented for this artifact type (see references/readiness_report.md)."
   ]
 }

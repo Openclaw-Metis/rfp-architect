@@ -1,0 +1,12 @@
+# Normalize all text to LF in the repo and on checkout. The release-evidence audit
+# hashes working-tree bytes, so a Windows CRLF checkout would otherwise break the
+# SHA-256 match (core.autocrlf=true rewrites LF->CRLF). Forcing eol=lf keeps the
+# deterministic-functional gate verifiable on every platform.
+* text=auto eol=lf
+
+# Explicit: these are always text.
+*.py    text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.txt   text eol=lf

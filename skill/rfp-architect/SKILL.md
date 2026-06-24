@@ -1,7 +1,7 @@
 ---
 name: rfp-architect
 description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬、變更管理與退場返還、價格配分與計費合規）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
-version: 2026.6.16
+version: 2026.6.25
 metadata:
   author: "Openclaw-Metis"
 ---

@@ -2,6 +2,31 @@
 
 All notable changes to **rfp-architect** are recorded here. Versions use CalVer (`YYYY.M.D`).
 
+## [2026.6.25] — Published
+
+A SkillOpt-style optimization pass on the deterministic scorer: reproduce the 2026.6.16 baseline → adversarial rollout against `rfp_lint.py` → two bounded fixes → held-out validation + final-test gate. Linter `rfp_lint-6 → rfp_lint-7`. No `SKILL.md` / routing / reference / task-eval change — only the eval-table compliance rules now parse weights correctly.
+
+### Fixed
+- **Price-band false negative** — a verbose price-row label (e.g.「價格合理性與成本效益綜合評估」) exceeded the fixed-width `_label_pct` window, so a government non-fixed-price案 with 價格 60% silently passed the《最有利標評選辦法》§16/§17 50% cap. Added row-aware detection (`_row_label_pct`, keyed on the row's first/label cell) so prefixed / numbered / verbose price labels are caught; the same path also closed the identical hole for the §10 簡報/詢答 20% cap.
+- **Weight-sum false positive** — a passing-threshold / subtotal row (「評選及格門檻 70%」「總分 100%」) was summed as a weight, inflating the total and wrongly failing a valid 100% table. Added `_NON_WEIGHT_ROW` exclusion (門檻 / 及格 / 合格 / 底標 / 底價 / 總分 / 滿分 / 合計 / 小計 / 總計). A real bad sum that co-exists with a threshold row is still caught.
+
+### Changed
+- **`rfp_lint.py` → `rfp_lint-7`**: price / simulation weight rules union prose + row-aware detection (price uses max for the >50 cap, min for the <20 floor); weight-sum skips threshold/subtotal rows. JSON output schema unchanged (only the `grader_version` value moves).
+- **`rfp_lint_selftest.py`**: 15 → 17 deterministic cases (`verbose price label over 50 → blocker`, `threshold row not counted in weight sum → pass`).
+- **`audit_release_evidence.py`**: now audits the latest release set by version (globs `evidence-*.json`, follows its `benchmark_summary_path`) instead of hardcoding the 2026-06-16 filenames; older dated artifacts retained as history.
+- **`regression_gates.json`**: added `verbose-price-label-over-50-fails` and `threshold-row-not-counted-in-weight-sum`.
+
+### Release gate (all green)
+- `rfp_lint_selftest.py` — 17 deterministic cases PASS
+- starter `examples/starter/output.md` — lint PASS (20/20, 0 rule violations, `rfp_lint-7`)
+- `assets/templates/rfp-skeleton.md` — lint EXPECTED-FAIL (placeholder guard)
+- `scripts/audit_release_evidence.py` — release-evidence traceability PASS (latest = 2026.6.25)
+- held-out final-test set (6 cases) — 6/6 expected, no new false positive/negative
+- all eval / config JSON valid
+
+### Note
+- Legal sources unchanged this release; they remain as live-verified against 全國法規資料庫 on 2026-06-16 (see readiness report and `source-register.md`). `next_review_due: 2026-09-23`.
+
 ## [2026.6.16] — Published
 
 First formally **published** release (prior `2026.6.16` working tree was draft / local smoke-ready). This release is gated by a deterministic functional gate rather than a paired LLM benchmark — see "Release gate" below.

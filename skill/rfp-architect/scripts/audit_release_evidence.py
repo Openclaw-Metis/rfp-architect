@@ -27,13 +27,28 @@ def check_commit(value: str, label: str, findings: list):
         findings.append(f"{label} is not traceable: {value}")
 
 
+def _version_key(value: str) -> tuple:
+    parts = []
+    for chunk in str(value).split("."):
+        parts.append(int(chunk) if chunk.isdigit() else 0)
+    return tuple(parts)
+
+
+def _latest_evidence(release_dir: Path) -> Path:
+    """Audit the latest release: pick the evidence-*.json with the highest `version`.
+    Older dated artifacts are retained as history but not re-audited."""
+    candidates = sorted(release_dir.glob("evidence-*.json"))
+    if not candidates:
+        raise FileNotFoundError(f"no evidence-*.json in {release_dir}")
+    return max(candidates, key=lambda p: _version_key(json.loads(p.read_text(encoding="utf-8")).get("version", "0")))
+
+
 def audit(root: Path) -> dict:
     release_dir = root / "release"
-    evidence_path = release_dir / "evidence-20260616.json"
-    summary_path = release_dir / "benchmark-summary-2026.6.16.json"
-
+    evidence_path = _latest_evidence(release_dir)
     findings = []
     evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    summary_path = release_dir / Path(evidence["benchmark_summary_path"]).name
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
     source_path = local_source_path(release_dir, summary["source_path"])

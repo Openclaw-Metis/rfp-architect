@@ -2,6 +2,45 @@
 
 This file is release evidence for the current skill version. It records mechanical gate results and must be updated whenever `SKILL.md`, scripts, references, eval assets, or release artifacts change.
 
+## Release - 2026-06-25 (version 2026.6.25, status: published)
+
+Audit date: 2026-06-25. Current version: `2026.6.25`. Lifecycle status: **published** (`last_released_at: 2026-06-25`). Linter grader: `rfp_lint-7`.
+
+Primary objective of this pass: a SkillOpt-style optimization pass on the deterministic scorer — reproduce the 2026.6.16 baseline, run an adversarial rollout against `rfp_lint.py`, fix two empirically-confirmed defects with bounded edits, and gate them on a held-out validation + final-test set before release. No `SKILL.md` / routing / reference / task-eval change; the patch only makes the eval-table compliance rules parse weights correctly.
+
+### Defects fixed (each confirmed with a held-out case, then added as a permanent regression guard)
+- **False negative (price band):** a verbose price-row label (e.g.「價格合理性與成本效益綜合評估」) exceeded the fixed-width `_label_pct` window, so a government non-fixed-price案 with 價格 60% silently passed the §16/§17 50% cap. `rfp_lint-7` adds row-aware detection (`_row_label_pct`, keyed on the row's first/label cell), so prefixed / numbered / verbose price labels are caught; the same path also closed the identical hole for the §10 簡報/詢答 20% cap.
+- **False positive (weight sum):** a passing-threshold / subtotal row (「評選及格門檻 70%」「總分 100%」) was summed as a weight, inflating the total and wrongly failing a valid 100% table. `rfp_lint-7` excludes threshold/subtotal rows (`_NON_WEIGHT_ROW`: 門檻 / 及格 / 合格 / 底標 / 底價 / 總分 / 滿分 / 合計 / 小計 / 總計). A *real* bad sum that merely co-exists with a threshold row is still caught.
+
+### Substantive changes
+- `scripts/rfp_lint.py` → `rfp_lint-7`: added `_row_label_pct` + `_NON_WEIGHT_ROW`; price / simulation weight rules now union prose + row-aware detection (price uses max for the >50 cap, min for the <20 floor); weight-sum skips threshold/subtotal rows. JSON output schema unchanged (only the `grader_version` value moves).
+- `scripts/rfp_lint_selftest.py`: 15 → 17 deterministic cases (adds `verbose price label over 50 → blocker`, `threshold row not counted in weight sum → pass`).
+- `scripts/audit_release_evidence.py`: now audits the **latest** release set by version (globs `evidence-*.json`, picks the highest `version`, follows its `benchmark_summary_path`) instead of hardcoding the 2026-06-16 filenames — so future releases need no edit. The 2026-06-16 artifacts are retained as history.
+- `assets/evals/regression_gates.json`: added `verbose-price-label-over-50-fails` and `threshold-row-not-counted-in-weight-sum`; selftest count note 15 → 17.
+- `release/*-20260625`: new deterministic-functional-gate artifacts (smoke + summary + evidence) with matching SHA-256 and traceable commit metadata.
+
+### Legal freshness
+No legal-source change in this release. The three sources remain as live-verified on 2026-06-16 (see the 2026-06-16 section and `source-register.md`); re-verify against 全國法規資料庫 before the next publish gate and at least every 90 days (`next_review_due: 2026-09-23`). Outputs always tell users to confirm against the official latest version before issuance.
+
+## Final gate
+
+- Overall status: **PASS — published.**
+- Release model: deterministic functional gate (knowledge + linter skill), identical in kind to 2026.6.16.
+- Blocking issues: none.
+
+### Evidence / commands run (all on the released tree, 2026-06-25, `python -X utf8`)
+- `python scripts/rfp_lint_selftest.py` — PASS (17 cases)
+- `python scripts/rfp_lint.py examples/starter/output.md --track government` — PASS, 20/20, 0 rule violations, `grader_version: rfp_lint-7`
+- `python scripts/rfp_lint.py assets/templates/rfp-skeleton.md --track government` — EXPECTED FAIL (placeholder guard)
+- `python scripts/audit_release_evidence.py . --json` — PASS (latest release = 2026.6.25; SHA-256 + embedded summary + commit traceability consistent)
+- `python -m json.tool` on every `assets/evals/*.json`, `examples/starter/expected_properties.json`, `release/*.json` — PASS
+- Held-out final-test set (6 cases distinct from the regression guards: composite label, numbered price label in-band & over-cap, verbose simulation label, enterprise-track skip, real bad-sum-with-threshold-row, subtotal row) — 6/6 expected, no new false positive/negative.
+
+### Compatibility / residual risk
+- No `SKILL.md` / routing / trigger change → no neighbor-confusion or context-bloat impact. No LLM in the gated path → negligible latency/token delta. Task evals #12/#14 (price > 50 → Blocker) and all trigger evals remain valid; the patch only widens detection coverage.
+- Known limitation (pre-existing, not introduced here): a non-price item whose label *contains*「價格」(e.g.「技術（含價格分析能力）」) can be read as a price weight — this also held under the prior prose matcher and errs toward flagging for human review.
+- Rollback: revert `scripts/rfp_lint.py`, `scripts/rfp_lint_selftest.py`, `scripts/audit_release_evidence.py`, `assets/evals/regression_gates.json` to the `rfp_lint-6` state and drop the `release/*-20260625` artifacts.
+
 ## Release - 2026-06-16 (version 2026.6.16, status: published)
 
 Audit date: 2026-06-16. Current version: `2026.6.16`. Lifecycle status: **published** (`last_released_at: 2026-06-16`). Linter grader: `rfp_lint-6`.

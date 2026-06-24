@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for rfp_lint.py high-risk rules (rfp_lint-6)."""
+"""Regression tests for rfp_lint.py high-risk rules (rfp_lint-7)."""
 
 from rfp_lint import lint
 
@@ -175,6 +175,27 @@ def main():
             f"expected 驗收 heading, got {acc.get('heading')}")
     assert_("evidence carries matched keyword", acc.get("matched") == "驗收",
             f"expected matched=驗收, got {acc.get('matched')}")
+
+    # --- V7: row-aware eval-table parsing ---
+    # verbose-price-label-over-50-fails: a verbose price-row label must not hide an
+    # over-cap weight (regression for the fixed-width _label_pct window false-negative).
+    verbose_price_over = """| 評選項目 | 權重 |
+|---|---:|
+| 技術能力 | 40% |
+| 價格合理性與成本效益綜合評估 | 60% |"""
+    assert_case("verbose price label over 50 → blocker",
+                draft("政府採購 報價 總包價", verbose_price_over), False, track="government")
+
+    # threshold-row-not-counted-in-weight-sum: a 及格/門檻 row must not inflate the
+    # weight total and wrongly fail a valid 100% table (false-positive regression).
+    threshold_row_table = """| 評選項目 | 權重 |
+|---|---:|
+| 技術 | 40% |
+| 管理 | 30% |
+| 價格 | 30% |
+| 評選及格門檻 | 70% |"""
+    assert_case("threshold row not counted in weight sum → pass",
+                draft("政府採購 報價 總包價", threshold_row_table), True, track="government")
 
     print("rfp_lint_selftest: PASS")
 

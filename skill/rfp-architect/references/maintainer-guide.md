@@ -72,6 +72,12 @@ Qualitative:
 - Maximum under-trigger failures：direct trigger 漏觸發 0。
 - Maximum over-trigger failures：negative（RFQ / 通用寫作）誤觸發 0。
 - Government compliance regression：非固定價格政府案價格 <20% 或 >50% 必須 fail；固定價格給付案價格 <20% 可通過但須提示文件明載固定價格；政府案簡報 / 詢答 >20% 必須 fail；配分合計非 100% 必須 fail；政府案缺評選委員會 / 退場（涉個資 / 雲端）必須升級為 Blocker。
+- Linter accuracy regression：`rfp_lint-8` 必須正確處理企業軌否定語、固定價格明示、一般 / 巢狀中英文評選標題、百分比 / 100 分制權重欄，以及與權重分欄的計分公式百分比。
+
+### Frozen linter benchmark
+- 修改 parser 前先固定 `assets/evals/linter_benchmark.json` 的 development／held-out cases；先跑 baseline development，再做 bounded candidate edit。
+- Candidate development 全綠後才執行 held-out；看過 held-out 結果後不再回頭調整同一候選的 linter 邏輯。
+- 執行命令：`python3 scripts/run_linter_benchmark.py --split development|held_out|all --json`。相同 benchmark 下 baseline 與 candidate 都保留 grader version、case status 與 pass rate。
 
 ### Feedback loop
 - Common failure signals：產出漏掉台灣在地條款、或 review 只給泛泛建議。
@@ -117,8 +123,9 @@ Qualitative:
 
 ## Resources（完整資源目錄）
 
-- `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用；v6 含證據定位、否定語警示、政府軌條件式嚴重度）。
-- `scripts/rfp_lint_selftest.py`：linter 高風險規則回歸測試。
+- `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用；v8 採欄位感知配分解析，並保留 v6 的證據定位、否定語警示與條件式嚴重度）。
+- `scripts/rfp_lint_selftest.py`：linter 21 個高風險規則回歸測試。
+- `scripts/run_linter_benchmark.py`：執行 frozen development／held-out linter accuracy benchmark。
 - `scripts/audit_release_evidence.py`：release evidence traceability 檢查。
 - `references/rfp-anatomy.md`：文件家族與 11 必備章節、需求工程、撰寫流程。
 - `references/taiwan-procurement.md`：招標 / 決標 / 異質採購 / 最有利標 / 評選委員會 / 三種評定方式 / 序位法 / 等標期 / 價格 20–50% 區間 / 資訊服務委外專法（§8）。
@@ -136,3 +143,4 @@ Qualitative:
 - `policies/`：release / portability / retirement 政策。
 - `examples/`：example-as-test fixtures。
 - `assets/`：模板與 eval fixtures。
+- `assets/evals/linter_benchmark.json`：`rfp_lint-8` 的 8 個凍結準確度案例與預期行為。

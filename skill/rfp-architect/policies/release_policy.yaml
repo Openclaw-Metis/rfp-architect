@@ -2,14 +2,23 @@ release_policy:
   required_checks:
     - format
     - structure
+    - point_of_use_references
     - workflow_contract
     - lifecycle
     - lifecycle_state
     - eval_coverage
+    - security
     - rfp_lint_selftest
+    - frozen_linter_benchmark
+    - starter_example_lint
+    - skeleton_placeholder_guard
+    - legal_source_freshness
     - release_evidence_traceability
   block_if:
     - has_todo
     - missing_owner
     - stale_audit
+    - security_failure
+    - benchmark_regression
+    - incomplete_legal_freshness
     - untraceable_release_evidence

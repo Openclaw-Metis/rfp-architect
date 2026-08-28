@@ -1,9 +1,8 @@
 ---
 name: rfp-architect
 description: "撰寫或審查委外開發、資訊系統與軟體採購的建議書徵求說明書（RFP / Request for Proposal，亦稱建議書徵求文件、需求說明書、招標需求規格）。兩種模式：write 依台灣政府採購語境（最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、著作權歸屬、變更管理與退場返還、價格配分與計費合規）產出結構完整、可評選、可驗收的 RFP 草稿；review 以 checklist／rubric 逐項審查既有 RFP，依嚴重度（Blocker／Major／Minor）回報缺漏與可貼用的修正建議。觸發語：『幫我寫一份 RFP / 需求說明書 / 招標文件』『審查 / 健檢這份建議書徵求文件』『委外開發 RFP 怎麼寫』『write/review an RFP for software outsourcing』。不適用：純硬體或標準品比價（用 RFQ）、營建工程細部規範、得標後 SOW 與契約逐條談判、一般文章或簡報撰寫。"
-version: 2026.6.25
-metadata:
-  author: "Openclaw-Metis"
+version: 2026.8.28
+metadata: {"author":"Openclaw-Metis","language":"zh-TW","category":"procurement","short-description":"撰寫、審查與諮詢軟體及資訊系統委外 RFP","openclaw":{"emoji":"📑"}}
 ---
 
 # RFP Architect — 委外開發建議書徵求說明書（RFP）撰寫與審查
@@ -26,7 +25,7 @@ Use when:
 - 使用者要「審查 / 健檢 / 挑問題 / 給改進建議」一份既有的 RFP 或需求說明書。
 - 使用者問「委外 RFP 該包含什麼 / 怎麼寫 / 評選怎麼設計 / 序位法怎麼算 / 資安條款怎麼寫」。
 
-Do not use when:
+Do not use when（命中任一情況時，停止執行本 skill，並建議 RFQ、契約流程或適用的專業路徑）:
 - 標的是純硬體或規格標準品、只需比價 → 用 RFQ，不是 RFP。
 - 任務是得標後的 SOW 細部、契約逐條談判、驗收執行。
 - 任務是營建工程採購的細部技術規範、或與委外採購無關的一般寫作。
@@ -55,7 +54,7 @@ Successful output:
 3) **RFP 知識諮詢（advise 模式｜輕量）**
 - Trigger examples：「委外 RFP 評選怎麼設計」「序位法怎麼算」「資安條款怎麼寫」「RFP 的變更管理 / 退場條款怎麼寫」「價格權重佔比上限是多少」「資訊服務委外怎麼計費」
 - Required inputs：具體問題
-- Expected result：依 `<output_contract>` advise 五段式回答（結論→白話→政府/企業差異→可貼用條款或配分→法規版本提醒），**不被迫產出完整 RFP 或完整 review findings**；必要時再引導進 write / review
+- Expected result：依 `<output_contract>` advise 五段式回答（結論→白話→政府/企業差異→可貼用條款或配分→法規版本提醒），**不被迫產出完整 RFP 或完整 review findings**；當使用者進一步要求撰寫或審查整份文件時，才引導切換 write / review
 
 ## Communication notes
 
@@ -95,37 +94,37 @@ Step 0: 判定模式並蒐集輸入
   - **政府 / 企業軌不明**：不停止；以「待確認：採購軌道」並列政府軌 / 企業軌兩處關鍵差異往下走，請使用者擇定。
   - **預算不明**：不停止；以「未揭露預算」往下走，評選與付款條款先以區間 / 原則撰寫。
   - **資安等級不明**：不停止；先列普 / 中 / 高判斷條件與待確認事項，預設依個資 / 關鍵業務傾向中 / 高。
-- Input:使用者請求、附帶檔案、`references/rfp-anatomy.md`（文件家族判定 RFP / RFI / RFQ / SOW）。
+- Input:使用者請求、附帶檔案；需要判定 RFP / RFI / RFQ / SOW 文件家族時載入 [RFP 文件家族與需求工程](references/rfp-anatomy.md)。
 - Output:確定模式（write / review / advise）＋採購軌道（政府 / 企業 / 待確認）＋已確認輸入與**明列假設**清單。
 - Validation:模式必須為 write / review / advise 其一；一旦標的其實該用 RFQ 或屬契約談判，就停止並改建議正確路徑，不硬產 RFP。所有「待確認」假設須在輸出中明列，不得當成已確認事實。
 
 Step W1（write）: 載入知識庫並完成需求鎖定
-- Action:載入 `references/rfp-anatomy.md`、`references/taiwan-procurement.md`、`references/clause-library.md`；把使用者輸入整理成業務目標、功能需求（分級）、非功能門檻；缺可驗收標準的需求就補問或標記為待確認。
+- Action:先依文件類型判定規則載入 [RFP 文件家族與需求工程](references/rfp-anatomy.md) 固定 11 章節與需求品質，再依 [台灣政府採購法制](references/taiwan-procurement.md) 判斷政府軌規則，並從 [RFP 條款庫](references/clause-library.md) 選用符合標的的條款；把使用者輸入整理成業務目標、功能需求（分級）、非功能門檻，缺可驗收標準的需求就補問或標記為待確認。
 - Input:Step 0 輸入、三份 references。
 - Output:結構化需求清單（含優先級與驗收標準雛形）。
-- Validation:每條納入草稿的功能需求都要可對應一個驗收標準；做不到的標記「待確認」，不得假裝完整。
+- Validation:逐條檢查納入草稿的功能需求是否可對應驗收標準；若無法對應，必須標記「待確認」並停止宣稱草稿完整。
 
 Step W2（write）: 套用骨架產出 RFP 草稿
-- Action:以 `assets/templates/rfp-skeleton.md` 為骨架，逐節填實 11 章節；政府採購案套用 `taiwan-procurement.md` 設計招標 / 決標 / 評選配分與評選委員會；依標的從 `clause-library.md` 貼入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬、變更管理流程、退場 / 資料返還、計費方式等在地與契約條款；資訊服務政府採購案另依 `taiwan-procurement.md` §8 對照《機關委託資訊服務廠商評選及計費辦法》之法定應載事項，並確認價格配分落在 20%–50% 法定區間。
+- Action:先依既定章節骨架套用 [RFP 填空骨架](assets/templates/rfp-skeleton.md) 並逐節填實 11 章節；政府採購案依 [台灣政府採購法制](references/taiwan-procurement.md) 設計招標 / 決標 / 評選配分與評選委員會，並從 [RFP 條款庫](references/clause-library.md) 選入資安分級、禁用清單、資料落地、繁中在地化、著作權歸屬、變更管理、退場 / 資料返還與計費條款；政府資訊服務案另以 [資訊服務 §5 應載事項對照](references/info-service-article5-map.md) 逐款檢查招標文件內容，並確認價格配分落在 20%–50% 法定區間。
 - Input:Step W1 需求清單、骨架模板、條款庫。
 - Output:填實的 RFP 草稿（zh-TW），凡 `【填入：…】` 必須補實或標記「不適用＋原因」。
 - Validation:不得保留空節或未說明的 `【填入】`（`rfp_lint.py` 占位符規則會擋）；評選章節必含配分與決標方式；政府採購案必含合法評選委員會組成、價格 20–50% 權重，並於文件標註「法規版本 / 查核日期 / 待法務確認」（host 不允許即時查核時，不得宣稱為最新法規，僅標示依內建版本整理、發包前以官方最新版確認）。
 
 Step W3（write）: 自我檢核
-- Action:對草稿執行 `python3 scripts/rfp_lint.py <draft> --track government|enterprise --json`；政府採購案須修正所有 Blocker 章節缺漏**與規則違規（占位符未填、簡報 > 20%、非固定價格案價格不在 20–50%、配分合計非 100%）**，固定價格給付案價格低於 20% 時須於招標文件明載固定價格給付；企業委外案不硬套政府採購價格 / 簡報法定限制，但仍須修正占位符與配分合計錯誤；再以 `references/review-rubric.md` 自審一輪一致性。
+- Action:執行機械檢核時使用 [RFP deterministic linter](scripts/rfp_lint.py) 執行 `python3 scripts/rfp_lint.py <draft> --track government|enterprise --json`；政府採購案須修正所有 Blocker 章節缺漏**與規則違規（占位符未填、簡報 > 20%、非固定價格案價格不在 20–50%、配分合計非 100%）**，固定價格給付案價格低於 20% 時須於招標文件明載固定價格給付；企業委外案不硬套政府採購價格 / 簡報法定限制，但仍須修正占位符與配分合計錯誤；再以 [RFP 審查 rubric](references/review-rubric.md) 自審一輪一致性。
 - Input:草稿、`scripts/rfp_lint.py`、`references/review-rubric.md`。
 - Output:通過 lint（無 Blocker 缺漏、無規則違規）的最終草稿＋一句覆蓋率說明。
 - Validation:一旦 lint 回報任何 Blocker 缺漏或 rule_violations > 0（含占位符殘留），就必須補齊 / 修正後再返回，不得交付帶 Blocker 或 rule violation 的草稿。輸出末尾可列「待確認事項」，但草稿正文不得保留 `【填入】`、`__%`、`TODO` 或 `待補` 這類未完成占位符。
 
 Step R1（review）: 機械初篩
-- Action:讀取待審 RFP 全文，理解其標的與採購情境；依採購軌道執行 `python3 scripts/rfp_lint.py <file> --track government|enterprise --json` 取得缺漏的章節 / 條款清單與規則違規。固定價格給付政府案可加 `--fixed-price`，但文件本身仍應明載固定價格給付。
+- Action:讀取待審 RFP 全文，理解其標的與採購情境；使用 [RFP deterministic linter](scripts/rfp_lint.py) 依採購軌道執行 `python3 scripts/rfp_lint.py <file> --track government|enterprise --json`，取得缺漏章節、條款與規則違規。固定價格給付政府案可加 `--fixed-price`，但文件本身仍應明載固定價格給付。
 - Input:待審 RFP、`scripts/rfp_lint.py`。
 - Output:機械初篩結果（present / missing、coverage、blockers）。
 - Validation:lint 結果只作初篩訊號；命中關鍵字不代表品質足夠，仍須進 Step R2 逐項判定。
 
 Step R2（review）: 套用 rubric 逐項判定
-- Action:載入 `references/review-rubric.md`，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；對台灣政府採購案，特別檢查評選配分揭露、價格配分是否落在 20%–50% 法定區間（固定價格案除外）、評選委員會合法性、資安分級、智財歸屬（含分包著作權鏈條）、驗收標準、變更管理流程與退場 / 資料返還條款。
-- Input:待審 RFP、初篩結果、rubric、必要時 `taiwan-procurement.md`、`clause-library.md`。
+- Action:進行逐項語意判定時載入 [RFP 審查 rubric](references/review-rubric.md)，逐項判定符合 / 缺漏 / 不足，標註嚴重度（Blocker / Major / Minor）；政府資訊服務案另以 [資訊服務 §5 應載事項對照](references/info-service-article5-map.md) 提供法規可追溯 finding。對台灣政府採購案，依 [台灣政府採購法制](references/taiwan-procurement.md) 檢查評選配分揭露、價格配分是否落在 20%–50% 法定區間（固定價格案除外）、評選委員會合法性，並依 [RFP 條款庫](references/clause-library.md) 檢查資安分級、智財歸屬、驗收、變更管理與退場條款。
+- Input:待審 RFP、初篩結果與 rubric；偵測到政府採購、資訊服務、個資、AI、資料、雲端或供應鏈情境時，載入上列對應法制、對照表與條款庫，不以「必要時」省略必要檢查。
 - Output:findings 清單，每項含 [嚴重度] 位置、為什麼重要、可貼用修正建議。
 - Validation:每個 Blocker / Major 都必須有定位與具體可貼用修正，不得只給泛泛批評。
 
@@ -133,10 +132,10 @@ Step R3（review）: 彙整與優先順序
 - Action:依嚴重度排序 findings，產出 summary（整體判斷＋最關鍵的 3 項優先修正）。
 - Input:Step R2 findings。
 - Output:findings（先）＋ summary（後）＋優先修正順序。
-- Validation:summary 不得用「大致 OK」稀釋仍存在的 Blocker；只要有 Blocker，整體結論就是「需修正後才宜發布」。
+- Validation:只要有 Blocker，必須將整體結論寫為「需修正後才宜發布」，不得用「大致 OK」稀釋風險。
 
 Step F: 收尾與輸出契約檢查
-- Action:對照 `<output_contract>` 確認格式；write 確認無空節、無未說明 `【填入】`；review 確認 findings 在前、summary 在後。需要寫入檔案時，先徵得同意再寫到使用者指定路徑。
+- Action:對照 `<output_contract>` 確認格式；write 確認無空節、無未說明 `【填入】`；review 確認 findings 在前、summary 在後。需要寫入檔案時，先徵得同意再寫到使用者指定路徑；若未取得同意或寫入失敗，停止寫入並回報未寫入的內容與原因。
 - Input:最終產物。
 - Output:符合輸出契約的交付物＋一行檢核摘要。
 - Validation:不符合輸出契約就修正後再返回。
@@ -165,23 +164,23 @@ Formatting rules:
 - 預設 zh-TW Markdown。
 - write 草稿用標題與表格（功能需求、評選配分用表格）。
 - review 先列 findings、後列 summary。
-- 只要有任一 Blocker，結論不得使用「大致可用 / 基本符合」等稀釋語氣。
-- 結論採 fail-first gate 精神：任一 final gate、stage gate 或 policy gate 為 FAIL / BLOCKED 時，結論只能是 FAIL 或 BLOCKED；對應本 skill，即 `rfp_lint` 或 review 出現任一 Blocker 時，結論只能是「需修正後才宜發布」，不得放行。
+- 只要有任一 Blocker，必須把結論標為「需修正後才宜發布」，不得使用「大致可用 / 基本符合」等稀釋語氣。
+- 結論採 fail-first gate 精神：任一 final gate、stage gate 或 policy gate 為 FAIL / BLOCKED 時，必須將結論標為 FAIL 或 BLOCKED；對應本 skill，即 `rfp_lint` 或 review 出現任一 Blocker 時，必須將結論標為「需修正後才宜發布」，不得放行。
 - 局部 PASS 只可列在定位資訊，且必須明確標註不具放行效力；例如「其餘章節齊備」只能作為說明，不能用來覆蓋仍存在的 Blocker。
-- 資訊缺漏時，標記「待確認」並列出需補的項目，不得臆造數值（預算、罰則、法條版本）。
+- 資訊缺漏時，必須標記「待確認」並列出需補的項目，不得臆造數值（預算、罰則、法條版本）。
 </output_contract>
 
 <tool_rules>
-- `scripts/rfp_lint.py`：write 在 Step W3、review 在 Step R1 各執行一次；政府案使用 `--track government`，企業案使用 `--track enterprise`，採購軌道未明時可用 `--track auto` 但不得用 auto 的推論取代人工判斷。它是關鍵字完整度與高風險規則初篩，不是完整品質評分，命中不代表足夠。
-- `scripts/rfp_lint_selftest.py`：release / 修改 linter 後必跑，守住政府價格上下限、固定價格例外、企業軌、簡報上限、配分合計與占位符規則。
-- `scripts/audit_release_evidence.py`：release evidence 修改後必跑，確認 benchmark hash、embedded summary 與 git commit traceability 一致。
+- write 在 Step W3、review 在 Step R1 使用 [RFP deterministic linter](scripts/rfp_lint.py) 各執行一次；政府案使用 `--track government`，企業案使用 `--track enterprise`，採購軌道未明時可用 `--track auto`，並在輸出標示推論結果供人工確認。它只提供完整度與高風險規則初篩，最終品質仍由 rubric 判定。
+- 修改 linter 或準備 release 時執行 [linter 回歸測試](scripts/rfp_lint_selftest.py)，確認政府價格上下限、固定價格例外、企業軌、簡報上限、配分合計與占位符規則維持預期。
+- 修改 release evidence 後執行 [release evidence 稽核器](scripts/audit_release_evidence.py)，確認 benchmark hash、embedded summary 與 git commit traceability 一致；稽核失敗時停止發布並修正 evidence。
 - 寫檔案、輸出到外部位置屬有副作用動作：一旦要把草稿寫成檔案或送到外部，就必須先取得使用者同意並確認路徑。
-- 本 skill 不需網路或外部 API；不得假設可存取廠商系統或即時法規資料庫。引用法條時提醒以全國法規資料庫最新版為準。
+- 本 skill 的 runtime 不需網路或外部 API；引用法條時，使用 [法律來源登錄與 freshness policy](references/source-register.md) 標示內建查核版本，並提醒發包前以全國法規資料庫最新版確認。若來源逾 freshness policy 且 host 無法查核，就明示限制並停止宣稱法規為最新。
 - 保持 active 工具集最小：只用 rfp_lint.py 與檔案讀寫，不引入非必要工具。
 </tool_rules>
 
 <default_follow_through_policy>
-- Directly do：在對話中產出 RFP 草稿、審查 findings 或 advise 五段式回答、讀取使用者提供的檔案、執行 `rfp_lint.py`、引用知識庫。預算 / 採購軌 / 資安等級不明時，依最小可開工策略**明列假設往下走**，不卡住。
+- Directly do：在對話中產出 RFP 草稿、審查 findings 或 advise 五段式回答、讀取使用者提供的檔案、執行 [RFP deterministic linter](scripts/rfp_lint.py) 並引用知識庫。預算 / 採購軌 / 資安等級不明時，依最小可開工策略**明列假設往下走**；linter 無法執行時改用 rubric 人工檢核並揭露機械 gate 未執行。
 - Ask first：把草稿寫成檔案、覆寫既有檔案、輸出到指定目錄、或大幅改寫使用者既有 RFP 結構。
 - Stop and report：僅在缺**無可替代**的關鍵輸入時停止——write 無標的、review 無待審文件、標的其實應走 RFQ 或屬契約談判、或使用者要求臆造法條 / 預算 / 罰則數值。預算 / 軌道 / 資安等級不明**不是**停止條件（改列假設）。
 </default_follow_through_policy>
@@ -212,19 +211,36 @@ Output:
 
 <model_notes>
 - GPT-style models：write 時逐章節明確產出、勿跳節；review 時逐 rubric 項判定。
-- Reasoning models：給清楚目標（可評選、可驗收、合法）與約束（11 章節、嚴重度分級），不要把中間推理寫進交付物。
+- Reasoning models：必須提供清楚目標（可評選、可驗收、合法）與約束（11 章節、嚴重度分級），且不得把中間推理寫進交付物。
 - Multi-turn split：大型 RFP（多子系統）可拆成「需求釐清 → 草稿 → 自我檢核」多回合；review 長文件可先機械初篩再分章審查。
 </model_notes>
 
-## Knowledge base（runtime 按需載入）
+## Runtime 知識載入條件
 
-- `references/rfp-anatomy.md` — 文件家族（RFP/RFI/RFQ/SOW）＋11 必備章節＋需求工程。
-- `references/taiwan-procurement.md` — 招標 / 決標 / 最有利標 / 評選委員會 / 序位法 / 等標期 / 價格 20–50% 區間 / 資訊服務委外專法（§8）。
-- `references/clause-library.md` — 台灣在地與契約條款庫（A–N 在地 / 契約；**O–R AI 系統 / 資料治理 / 雲端韌性 / 供應鏈**）。
-- `references/info-service-article5-map.md` — 《機關委託資訊服務廠商評選及計費辦法》§5 應載事項 → RFP 章節 → linter check → review 嚴重度對照（政府資訊服務案 review 用）。
-- `references/review-rubric.md` — 審查心法、審查清單、嚴重度、八大常見錯誤、finding 格式。
-- `references/case-patterns.md` — 委外失敗模式 → RFP 控制點對照（公開案例）。
-- `references/source-register.md` — 法規 / 案例 / 數值規則來源登錄（URL、查核日、freshness policy）。
-- `assets/templates/rfp-skeleton.md` — write 模式填空骨架（含法規版本標頭與 RTM / 交付 / 付款矩陣）。
+- 判斷文件家族、建立 11 章節或設計需求驗收時載入 [RFP 文件家族與需求工程](references/rfp-anatomy.md)。
+- 處理台灣政府採購的招標、決標、評選、委員會、序位法、等標期或法定配分時載入 [台灣政府採購法制](references/taiwan-procurement.md)。
+- 需要可貼用的在地、契約、AI、資料、雲端或供應鏈條款時載入 [RFP 條款庫](references/clause-library.md)。
+- review 政府資訊服務案的法定應載事項時載入 [資訊服務 §5 應載事項對照](references/info-service-article5-map.md)。
+- review 逐項判定嚴重度、理由與修正格式時載入 [RFP 審查 rubric](references/review-rubric.md)。
+- 需要說明委外失敗模式與控制點的因果關係時載入 [委外案例模式](references/case-patterns.md)，並把案例視為說明材料而非法源。
+- 引用法律數值或判定內建內容是否過期時載入 [法律來源登錄與 freshness policy](references/source-register.md)。
+- write 模式開始產稿時使用 [RFP 填空骨架](assets/templates/rfp-skeleton.md)，填實或明確說明不適用後才交付。
 
-> 維護者導向內容（測試計畫、eval workflow、發版政策、troubleshooting、host / portability、完整資源目錄、量化發版門檻）見 `references/maintainer-guide.md`；runtime 寫 / 審 / 諮詢 RFP 不需載入。
+## 維護、驗證與生命週期操作
+
+- 維護者開始修改、測試或發版時先讀 [維護者指南](references/maintainer-guide.md)，依其中測試計畫與 host 邊界執行。
+- 人工 review 需要可重用記錄格式時使用 [審查清單模板](references/checklist_template.md)，但機械 gate 結果仍由測試工具決定。
+- 需要 rename、merge、split、deprecate 或相容期判斷時讀 [遷移治理規則](references/migration-governance.md)，先保存 rollback 再變更公開介面。
+- 每次修改 runtime、eval、schema、policy 或 release artifact 後更新 [readiness report](references/readiness_report.md)，只記錄本輪實際執行結果與限制。
+- 修改公開 skill 規格時以 [skill spec schema](schemas/skill_spec.schema.json) 驗證 frontmatter；修改生命週期時以 [lifecycle schema](schemas/lifecycle.schema.json) 驗證 manifest。
+- 保存可重播執行軌跡時依 [run trace schema](schemas/run_trace.schema.json) 產生資料；建立發版證據時依 [release evidence schema](schemas/release_evidence.schema.json) 驗證結果。
+- 執行生命週期 gate 時以 [lifecycle manifest](skill_lifecycle.yaml) 判定狀態、owner、風險、依賴與下一次審查日。
+- package 或 publish 前依 [release policy](policies/release_policy.yaml) 聚合必要 checks，並以 [portability policy](policies/portability_policy.yaml) 保持單一 runtime 來源。
+- deprecate 或 retire 前依 [retirement policy](policies/retirement_policy.yaml) 檢查替代版本、遷移指南與最短相容期。
+- 修改 trigger 或功能契約後，以 [task evals](assets/evals/evals.json) 檢查 direct、indirect、negative、near-miss 與 failure mode，並以 [trigger evals](assets/evals/trigger_evals.json) 單獨檢查描述路由。
+- 修改 deterministic scorer 或 release threshold 時，以 [regression gates](assets/evals/regression_gates.json) 固定必要回歸與放行門檻。
+- 改良 linter 準確度時先以 [frozen linter benchmark](assets/evals/linter_benchmark.json) 固定 development／held-out cases，再使用 [benchmark runner](scripts/run_linter_benchmark.py) 對同一批輸入比較 baseline 與 candidate。
+- 驗證首次使用流程時，以 [starter input](examples/starter/input.md) 觸發 write 模式、以 [starter output](examples/starter/output.md) 執行 lint，並以 [starter expected properties](examples/starter/expected_properties.json) 檢查必要章節與禁止占位符。
+- 重現 2026.6.16 baseline 時載入 [2026.6.16 benchmark smoke](release/benchmark-smoke-20260616.json) 與 [2026.6.16 benchmark summary](release/benchmark-summary-2026.6.16.json)，需要查核當次發布判定時再讀 [2026.6.16 release evidence](release/evidence-20260616.json)。
+- 重現 2026.6.25 baseline 時載入 [2026.6.25 benchmark smoke](release/benchmark-smoke-20260625.json) 與 [2026.6.25 benchmark summary](release/benchmark-summary-2026.6.25.json)，需要查核當次發布判定時再讀 [2026.6.25 release evidence](release/evidence-20260625.json)。
+- 驗證 2026.8.28 candidate 時載入 [2026.8.28 benchmark smoke](release/benchmark-smoke-20260828.json) 與 [2026.8.28 benchmark summary](release/benchmark-summary-2026.8.28.json)，需要查核本機 draft gate 與剩餘 publish 條件時再讀 [2026.8.28 validation evidence](release/evidence-20260828.json)。

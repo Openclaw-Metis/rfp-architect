@@ -1,0 +1,60 @@
+{
+  "artifact_type": "scored-deterministic-comparison",
+  "skill_version": "2026.8.28",
+  "host": "local/python3",
+  "model": "none-deterministic",
+  "temperature": null,
+  "run_timestamp": "2026-08-28T00:00:00Z",
+  "grader_version": "rfp_lint-8",
+  "benchmark_id": "rfp-lint-table-and-context-2026-08-28",
+  "budget": {
+    "model_calls": 0,
+    "external_calls": 0,
+    "runtime": "stdlib-only"
+  },
+  "baseline": {
+    "version": "2026.6.25",
+    "commit": "fc71766",
+    "grader_version": "rfp_lint-7",
+    "passed": 0,
+    "total": 8,
+    "pass_rate": 0.0
+  },
+  "candidate": {
+    "version": "2026.8.28",
+    "commit": "5de2140",
+    "grader_version": "rfp_lint-8",
+    "passed": 8,
+    "total": 8,
+    "pass_rate": 1.0
+  },
+  "splits": {
+    "development": {
+      "baseline": "0/4",
+      "candidate": "4/4"
+    },
+    "held_out": {
+      "candidate_first_run": "4/4",
+      "candidate_logic_changed_after_run": false
+    }
+  },
+  "delta": {
+    "pass_rate": 1.0,
+    "critical_safety_pass_rate": 1.0,
+    "model_calls": 0
+  },
+  "regression": {
+    "rfp_lint_selftest": "PASS (21 cases)",
+    "starter_output": "PASS (20/20; 0 rule violations)",
+    "skeleton_placeholder_guard": "EXPECTED FAIL",
+    "json_yaml_parse": "PASS",
+    "skillops_evaluate_security": "PASS",
+    "skillops_revise": "PASS",
+    "skillops_optimize": "PASS"
+  },
+  "decision": "ACCEPT",
+  "residual_risks": [
+    "The linter is a deterministic first pass and does not replace semantic rubric review.",
+    "Official legal sources can change; re-run the freshness check if publish occurs after 2026-11-26."
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for rfp_lint.py high-risk rules (rfp_lint-7)."""
+"""Regression tests for rfp_lint.py high-risk rules (rfp_lint-8)."""
 
 from rfp_lint import lint
 
@@ -196,6 +196,43 @@ def main():
 | 評選及格門檻 | 70% |"""
     assert_case("threshold row not counted in weight sum → pass",
                 draft("政府採購 報價 總包價", threshold_row_table), True, track="government")
+
+    # --- V8: context and table-column accuracy ---
+    # An explicit enterprise exclusion must beat a negated mention of 採購法.
+    enterprise_auto = lint(full_draft(
+        title="# 測試 RFP（一般企業委外）",
+        pricing="## 商業模式與定價\n一般企業 CRM 委外，廠商須報價。\n本案不適用政府採購法。",
+        evaluation="""## 評選標準與配分
+| 評選項目 | 權重 |
+|---|---:|
+| 技術 | 40% |
+| 價格 | 60% |""",
+    ), track="auto")
+    assert_("explicit enterprise exclusion controls auto track",
+            enterprise_auto["effective_track"] == "enterprise" and enterprise_auto["pass"] is True,
+            f"expected enterprise/pass, got {enterprise_auto['effective_track']}/{enterprise_auto['pass']}")
+
+    # A known budget is not the same as an explicitly fixed price or fee.
+    assert_case("known budget is not fixed price",
+                draft("政府採購 預算已定案 廠商仍須報價", fixed_low_table), False,
+                track="government")
+
+    # Generic evaluation headings must still activate the statutory rules.
+    generic_heading = clean_table.replace("| 價格 | 30% |", "| 價格 | 60% |").replace(
+        "| 技術 | 40% |", "| 技術 | 40% |")
+    assert_case("generic 評選方式 heading still parses table",
+                draft("政府採購 報價", generic_heading).replace("## 評選標準與配分", "## 評選方式"),
+                False, track="government")
+
+    # Formula percentages live in their own column and must not become weights.
+    formula_table = """| 評選項目 | 權重 | 計分方式 |
+|---|---:|---|
+| 技術 | 70% | 依內容評分 |
+| 價格 | 30% | 最低標價／投標標價 × 100% |"""
+    formula_result = lint(draft("政府採購 報價", formula_table), track="government")
+    assert_("formula percentage is not parsed as weight",
+            formula_result["pass"] is True and not formula_result["rule_findings"],
+            f"unexpected findings: {formula_result['rule_findings']}")
 
     print("rfp_lint_selftest: PASS")
 

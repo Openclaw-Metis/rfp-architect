@@ -4,9 +4,9 @@
 
 A dual-mode skill to **write** and **review** RFPs (建議書徵求說明書 / 需求說明書 / 招標需求規格) for outsourced software & information-system development — anchored in the Taiwan government-procurement context (最有利標、採購評選委員會、序位法、資安分級、資料落地、繁中在地化、價格配分與計費合規), and compatible with general enterprise outsourcing.
 
-> 版本 / Version：`2026.6.25`　·　狀態 / Status：**Published**　·　授權 / License：MIT
+> 版本 / Version：`2026.8.28`　·　狀態 / Status：**Published**　·　授權 / License：MIT
 >
-> Release gate：deterministic functional gate（`rfp_lint_selftest.py` 17 cases + starter example lint + skeleton expected-fail + release-evidence audit）全綠；法規來源於 2026-06-16 對全國法規資料庫**現場查核**通過（本版未變更法規來源）。詳見 `skill/rfp-architect/references/readiness_report.md` 與 `CHANGELOG.md`。
+> Release gate：SkillOps evaluate／revise／optimize／package／publish + security、`rfp_lint_selftest.py` 21 cases、frozen benchmark 8 cases、starter example lint、skeleton expected-fail 與 release-evidence audit 全綠。詳見 `skill/rfp-architect/references/readiness_report.md` 與 `CHANGELOG.md`。
 
 ## 兩種模式 / Two modes
 
@@ -44,8 +44,9 @@ A dual-mode skill to **write** and **review** RFPs (建議書徵求說明書 / �
 | `skill/rfp-architect/references/case-patterns.md` | 委外失敗模式 → RFP 控制點對照（公開個案示例，強化 review finding 的「為什麼重要」） |
 | `skill/rfp-architect/assets/templates/rfp-skeleton.md` | write 模式的填空骨架（含法規版本標頭與 RTM／交付／付款管理矩陣） |
 | `skill/rfp-architect/examples/starter/` | 範例輸入 `input.md` ＋ 通過 lint 的完整範例輸出 `output.md` |
-| `skill/rfp-architect/scripts/rfp_lint.py` | RFP 章節／在地條款／配分規則完整度檢查（`rfp_lint-7`，20 章節項；含占位符殘留、政府案簡報配分 >20%、政府非固定價格案價格不在 20–50%、配分合計非 100%；**V6：證據定位（行號／heading）、out-of-scope 否定語警示、政府軌／敏感標的條件式嚴重度**；**V7：row-aware 配分解析——冗長價格／簡報標籤不再漏判超標，weight-sum 排除門檻／小計列**；write 自審、review 初篩） |
-| `skill/rfp-architect/scripts/rfp_lint_selftest.py` | linter 高風險規則回歸測試 |
+| `skill/rfp-architect/scripts/rfp_lint.py` | RFP 章節／在地條款／配分規則完整度檢查（`rfp_lint-8`，20 章節項；V8 改用欄位感知解析，支援百分比或 100 分制、一般／巢狀中英文評選標題，並隔離計分公式中的百分比；同時修正企業軌否定語與固定價格判定） |
+| `skill/rfp-architect/scripts/rfp_lint_selftest.py` | linter 21 個高風險規則回歸測試 |
+| `skill/rfp-architect/scripts/run_linter_benchmark.py` | 對 frozen development／held-out cases 比較 linter baseline 與 candidate |
 | `skill/rfp-architect/scripts/audit_release_evidence.py` | release evidence traceability 檢查 |
 | `skill/rfp-architect/references/source-register.md` | 法規、案例與數值規則來源登錄（URL、查核日、版本與 freshness policy） |
 | `skill/rfp-architect/assets/evals/` | 觸發與功能 eval（含 direct／indirect／negative／near-miss，zh／en／mixed；trigger eval 與 task eval 分檔） |

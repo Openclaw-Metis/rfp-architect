@@ -10,12 +10,12 @@ Three layers:
 2) Compliance rules (regex-based): catches a class of HIGH-RISK errors that a
    keyword check cannot — leftover placeholders, price weight outside the statutory
    20%–50% band, simulation weight over 20%, and 評選 weights not summing to 100%.
-   Weight detection is row-aware (V7): the price / simulation rules also read the
-   whole eval-table row, so a verbose item label (e.g.「價格合理性與成本效益綜合
-   評估」) no longer hides an over-cap weight; and the weight-sum rule skips
-   threshold / subtotal rows (門檻 / 及格 / 合計…) that are not weights and would
-   otherwise inflate the total.
-3) Context-aware signals (V6):
+   Weight detection is column-aware (V8): the parser identifies the item and
+   weight columns, accepts percentages or 100-point tables, retains nested
+   evaluation subsections, and never treats a formula percentage in a notes cell
+   as a weight. Generic Chinese and English evaluation headings activate the same
+   rules; threshold / subtotal rows remain excluded from the total.
+3) Context-aware signals (V6, refined in V8):
    - Out-of-scope negation: a keyword that appears only inside a「不處理 / 不適用」
      context is surfaced as an ADVISORY warning (never a hard fail), because a
      keyword linter cannot safely tell prescriptive prohibitions (e.g.「不得使用
@@ -25,6 +25,9 @@ Three layers:
      more weight in a government 最有利標 / 資訊服務 case (and when 個資 / 雲端 /
      關鍵系統 are in play) than in a generic enterprise RFP, so their MISSING
      severity is escalated accordingly.
+   - Explicit enterprise exclusions override a negated mention of 政府採購法;
+     knowing the budget no longer implies fixed-price treatment, which requires
+     explicit fixed-price / fixed-fee wording or the CLI override.
 
 Used by both modes:
 - write mode: self-check a generated draft before returning it.
@@ -42,7 +45,7 @@ import json
 import re
 import sys
 
-GRADER_VERSION = "rfp_lint-7"
+GRADER_VERSION = "rfp_lint-8"
 
 # ---- Layer 1: completeness (key, label, base_severity, [keywords; any match = present]) ----
 CHECKS = [
@@ -75,6 +78,7 @@ SEV_RANK = {"blocker": 0, "major": 1, "minor": 2}
 _PLACEHOLDERS = ["【填入", "【__", "__%", "待補", "TODO", "xxx%", "XX%"]
 # integer percentage, excluding decimals like 99.9% (lookbehind rejects a preceding digit or dot)
 _INT_PCT = re.compile(r"(?<![\d.])(\d{1,3})\s*%(?!\.\d)")
+_NUMBER = re.compile(r"(?<![\d.])(\d{1,3}(?:\.\d+)?)(?![\d.])")
 
 # Out-of-scope negation: a section TOPIC declared absent / not handled. Deliberately
 # excludes 「不包含」 (a legitimate scope-exclusion keyword) and prescriptive 不得/禁止
@@ -90,6 +94,10 @@ _MAT_MARKERS = ("最有利標", "資訊服務", "機關委託資訊服務", "評
 # Eval-table row labels that are thresholds / subtotals, NOT scoring weights; they
 # must be excluded from the weight-sum check so they do not inflate the total.
 _NON_WEIGHT_ROW = ("門檻", "及格", "合格", "底標", "底價", "總分", "滿分", "合計", "小計", "總計")
+_ITEM_HEADER = ("評選項目", "評比項目", "項目", "criterion", "criteria", "item")
+_WEIGHT_HEADER = ("權重", "配分", "比重", "占比", "百分比", "weight", "score", "points")
+_PRICE_LABEL = ("價格", "報價", "price")
+_PRESENTATION_LABEL = ("簡報", "現場詢答", "詢答", "presentation", "briefing", "q&a")
 
 
 def _heading_map(lines):
@@ -149,19 +157,34 @@ def _effective_severity(key, base, track, sensitive, mat_context):
     return base
 
 
+def _heading_level(line):
+    match = re.match(r"^\s*(#{1,6})\s+", line)
+    return len(match.group(1)) if match else None
+
+
 def _eval_section(text):
-    """Return the 評選/配分 section (heading contains 評選 + 配分/權重/標準) up to the next heading."""
+    """Return an evaluation section, retaining nested headings and tables."""
     lines = text.splitlines()
     start = None
+    start_level = None
     for i, ln in enumerate(lines):
-        if ln.lstrip().startswith("#") and "評選" in ln and any(k in ln for k in ("配分", "權重", "標準")):
+        level = _heading_level(ln)
+        low = ln.lower()
+        topic = any(k in low for k in ("評選", "評分", "evaluation", "scoring"))
+        detail = any(k in low for k in (
+            "配分", "權重", "標準", "方式", "項目",
+            "criteria", "criterion", "method", "weight", "score",
+        ))
+        if level and topic and detail:
             start = i
+            start_level = level
             break
     if start is None:
         return ""
     out = [lines[start]]
     for ln in lines[start + 1:]:
-        if ln.lstrip().startswith("#"):
+        level = _heading_level(ln)
+        if level and level <= start_level:
             break
         out.append(ln)
     return "\n".join(out)
@@ -175,22 +198,77 @@ def _label_pct(blob, label_re):
     return vals
 
 
-def _row_label_pct(blob, keywords):
-    """Integer percentages from eval-table rows whose FIRST cell (the item label)
-    contains any keyword. Row-aware, so it catches verbose item labels such as
-    『價格合理性與成本效益綜合評估』that the fixed-width _label_pct window misses,
-    while ignoring keyword mentions that only appear in a description cell."""
-    vals = []
-    for ln in blob.splitlines():
-        if "|" not in ln:
+def _table_cells(line):
+    if "|" not in line:
+        return []
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _separator_row(cells):
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) for cell in cells)
+
+
+def _weight_value(cell):
+    """Read one declared table weight, never percentages from description cells."""
+    match = _INT_PCT.search(cell)
+    if match:
+        return float(match.group(1))
+    match = _NUMBER.search(cell)
+    return float(match.group(1)) if match else None
+
+
+def _eval_tables(blob):
+    """Parse Markdown evaluation tables using their declared item and weight columns."""
+    lines = blob.splitlines()
+    tables = []
+    i = 0
+    while i + 1 < len(lines):
+        header = _table_cells(lines[i])
+        separator = _table_cells(lines[i + 1])
+        if not header or not _separator_row(separator) or len(header) != len(separator):
+            i += 1
             continue
-        cells = [c.strip() for c in ln.split("|") if c.strip()]
-        if not cells:
+        lowered = [cell.lower() for cell in header]
+        weight_idx = next(
+            (idx for idx, cell in enumerate(lowered) if any(marker in cell for marker in _WEIGHT_HEADER)),
+            None,
+        )
+        if weight_idx is None:
+            i += 1
             continue
-        label = cells[0].lower()
-        if any(kw.lower() in label for kw in keywords):
-            vals += [int(x) for x in _INT_PCT.findall(ln)]
-    return vals
+        label_idx = next(
+            (idx for idx, cell in enumerate(lowered) if any(marker in cell for marker in _ITEM_HEADER)),
+            0,
+        )
+        rows = []
+        j = i + 2
+        while j < len(lines):
+            cells = _table_cells(lines[j])
+            if not cells:
+                break
+            if len(cells) <= max(label_idx, weight_idx):
+                j += 1
+                continue
+            value = _weight_value(cells[weight_idx])
+            if value is not None:
+                rows.append({"label": cells[label_idx], "value": value})
+            j += 1
+        tables.append(rows)
+        i = max(j, i + 1)
+    return tables
+
+
+def _table_label_values(tables, keywords):
+    return [
+        row["value"]
+        for table in tables
+        for row in table
+        if any(keyword.lower() in row["label"].lower() for keyword in keywords)
+    ]
+
+
+def _display_number(value):
+    return int(value) if float(value).is_integer() else value
 
 
 def _detect_track(text, requested):
@@ -201,9 +279,15 @@ def _detect_track(text, requested):
         "政府採購", "政府機關", "公法人", "受採購法", "採購法", "最有利標",
         "等標期", "評選委員會", "採購評選委員會", "機關委託資訊服務",
     )
-    enterprise_markers = ("一般企業", "企業委外", "公司採購", "民間企業")
+    enterprise_markers = ("一般企業", "企業委外", "公司採購", "民間企業", "private enterprise")
+    enterprise_exclusions = (
+        "不適用政府採購法", "不受政府採購法", "非政府採購", "not subject to government procurement",
+    )
     gov_hits = sum(1 for k in government_markers if k in text)
-    ent_hits = sum(1 for k in enterprise_markers if k in text)
+    low = text.lower()
+    ent_hits = sum(1 for k in enterprise_markers if k.lower() in low)
+    if ent_hits and any(marker.lower() in low for marker in enterprise_exclusions):
+        return "enterprise"
     if gov_hits:
         return "government"
     if ent_hits:
@@ -214,7 +298,11 @@ def _detect_track(text, requested):
 def _detect_fixed_price(text, forced):
     if forced:
         return True
-    return any(k in text for k in ("固定價格", "固定費用", "固定服務費用", "固定費率", "預算已定案", "預算確定"))
+    low = text.lower()
+    return any(k in low for k in (
+        "固定價格", "固定費用", "固定服務費用", "固定費率",
+        "fixed price", "fixed fee", "fixed rate",
+    ))
 
 
 def rule_checks(text, track="auto", fixed_price=False):
@@ -233,29 +321,31 @@ def rule_checks(text, track="auto", fixed_price=False):
 
     sec = _eval_section(text)
     if sec:
+        tables = _eval_tables(sec)
         # Taiwan government procurement compliance rules.
         if effective_track == "government":
             # presentation_weight_rule — 簡報/現場詢答 weight must be ≤20% (no statutory exception).
             # Union of prose detection and row-aware detection (verbose labels).
-            pres_vals = set(_label_pct(sec, r"(?:簡報|現場詢答|詢答)")) | set(
-                _row_label_pct(sec, ["簡報", "現場詢答", "詢答"]))
+            pres_vals = set(_label_pct(sec, r"(?:簡報|現場詢答|詢答|presentation|briefing|q&a)")) | set(
+                _table_label_values(tables, _PRESENTATION_LABEL))
             if pres_vals and max(pres_vals) > 20:
                 findings.append({
                     "rule": "presentation_weight", "severity": "major",
-                    "message": f"簡報 / 詢答配分 {max(pres_vals)}% 逾《最有利標評選辦法》§10 之 20% 上限。"
+                    "message": f"簡報 / 詢答配分 {_display_number(max(pres_vals))}% 逾《最有利標評選辦法》§10 之 20% 上限。"
                 })
             # price_weight_rule — price 20%–50% unless fixed-price案 only for the lower bound.
             # Union of prose detection and row-aware detection so a verbose price-row
             # label cannot hide an over-cap weight.
             is_fixed_price = _detect_fixed_price(text, fixed_price)
-            price_vals = set(_label_pct(sec, r"價格")) | set(_row_label_pct(sec, ["價格", "報價"]))
+            price_vals = set(_label_pct(sec, r"(?:價格|報價|price)")) | set(
+                _table_label_values(tables, _PRICE_LABEL))
             if price_vals and max(price_vals) > 50:
                 findings.append({
                     "rule": "price_weight", "severity": "blocker",
-                    "message": f"價格配分 {max(price_vals)}% 逾《最有利標評選辦法》§16/§17 之 50% 上限。"
+                    "message": f"價格配分 {_display_number(max(price_vals))}% 逾《最有利標評選辦法》§16/§17 之 50% 上限。"
                 })
             elif price_vals and min(price_vals) < 20:
-                lo = min(price_vals)
+                lo = _display_number(min(price_vals))
                 if is_fixed_price:
                     findings.append({
                         "rule": "price_weight", "severity": "info",
@@ -266,22 +356,19 @@ def rule_checks(text, track="auto", fixed_price=False):
                         "rule": "price_weight", "severity": "blocker",
                         "message": f"非固定價格案價格配分 {lo}% 低於《最有利標評選辦法》§16/§17 之 20% 下限。"
                     })
-        # weight_sum_rule — 評選 weights should sum to ~100% (count table-row %, not prose).
-        # Skip threshold / subtotal rows (門檻 / 及格 / 合計…), which are not weights.
-        row_pcts = []
-        for ln in sec.splitlines():
-            if "|" not in ln:
+        # weight_sum_rule — sum only the declared weight column, never formulas or notes.
+        for table in tables:
+            row_weights = [
+                row["value"] for row in table
+                if not any(marker in row["label"] for marker in _NON_WEIGHT_ROW)
+            ]
+            if len(row_weights) < 3:
                 continue
-            cells = [c.strip() for c in ln.split("|") if c.strip()]
-            if cells and any(m in cells[0] for m in _NON_WEIGHT_ROW):
-                continue
-            row_pcts += [int(x) for x in _INT_PCT.findall(ln)]
-        if len(row_pcts) >= 3:
-            total = sum(row_pcts)
+            total = sum(row_weights)
             if not (98 <= total <= 102):
                 findings.append({
                     "rule": "weight_sum", "severity": "major",
-                    "message": f"評選配分合計約 {total}%（偵測 {len(row_pcts)} 項表格配分），應修正為 100%。"
+                    "message": f"評選配分合計約 {_display_number(total)}%（偵測 {len(row_weights)} 項表格配分），應修正為 100%。"
                 })
 
     return findings

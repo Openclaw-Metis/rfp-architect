@@ -1,0 +1,133 @@
+{
+  "benchmark_id": "rfp-lint-table-and-context-2026-08-28",
+  "version": "1.0",
+  "skill_version": "2026.8.28",
+  "host": "local/python3",
+  "model": "none-deterministic",
+  "run_timestamp": "2026-08-28T00:00:00Z",
+  "frozen_at": "2026-08-28",
+  "scorer": "exact behavioral contract",
+  "metadata": {
+    "host": "local/python3",
+    "model": "none-deterministic",
+    "temperature": null,
+    "budget": "stdlib-only; zero model calls",
+    "stop_condition": "development passes before one held-out run"
+  },
+  "cases": [
+    {
+      "id": "dev-auto-enterprise-negated-procurement-law",
+      "split": "development",
+      "track": "auto",
+      "fixture": {
+        "title": "一般企業委外",
+        "pricing": "一般企業 CRM 委外，廠商須報價並提供預算明細。\n本案不適用政府採購法。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": true,
+        "effective_track": "enterprise",
+        "forbidden_rules": ["price_weight"]
+      }
+    },
+    {
+      "id": "dev-known-budget-is-not-fixed-price",
+      "split": "development",
+      "track": "auto",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，預算已定案；廠商仍須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 90% |\n| 價格 | 10% |"
+      },
+      "expected": {
+        "pass": false,
+        "effective_track": "government",
+        "rule_severities": {"price_weight": "blocker"}
+      }
+    },
+    {
+      "id": "dev-generic-evaluation-heading",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選方式\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {"price_weight": "blocker"}
+      }
+    },
+    {
+      "id": "dev-formula-percentage-is-not-weight",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 | 計分方式 |\n|---|---:|---|\n| 技術 | 70% | 依內容評分 |\n| 價格 | 30% | 最低標價／投標標價 × 100% |"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": ["price_weight", "weight_sum"]
+      }
+    },
+    {
+      "id": "held-points-without-percent-sign",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 配分 |\n|---|---:|\n| 技術 | 40 |\n| 價格 | 60 |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {"price_weight": "blocker"}
+      }
+    },
+    {
+      "id": "held-nested-evaluation-subheading",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準\n### 配分表\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {"price_weight": "blocker"}
+      }
+    },
+    {
+      "id": "held-explicit-fixed-price-low-weight",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "招標文件訂明固定價格給付，廠商詳列費用組成。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 配分 |\n|---|---:|\n| 技術 | 90 |\n| 價格合理性 | 10 |"
+      },
+      "expected": {
+        "pass": true,
+        "rule_severities": {"price_weight": "info"}
+      }
+    },
+    {
+      "id": "held-english-evaluation-heading",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "Taiwan government procurement",
+        "pricing": "Government procurement; vendors must submit prices.",
+        "evaluation": "## Evaluation Method\n| Item | Weight | Formula |\n|---|---:|---|\n| Technical | 40% | Panel score |\n| Price | 60% | Lowest bid / bid × 100% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {"price_weight": "blocker"}
+      }
+    }
+  ]
+}

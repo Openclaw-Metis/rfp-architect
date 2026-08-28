@@ -2,6 +2,29 @@
 
 All notable changes to **rfp-architect** are recorded here. Versions use CalVer (`YYYY.M.D`).
 
+## [2026.8.28] — Published
+
+Modernizes the skill for the current SkillOps contract and upgrades the deterministic scorer from `rfp_lint-7` to `rfp_lint-8`.
+
+### Fixed
+- **Evaluation-table parsing** — parses the declared item and weight columns instead of every percentage in a row, preventing formulas such as `最低標價／投標標價 × 100%` from becoming false price weights.
+- **Heading coverage** — applies rules under generic or nested Chinese／English evaluation headings instead of silently skipping the table.
+- **100-point tables** — treats numeric `配分`／`權重` cells as shares when the matrix uses points without `%`.
+- **Track context** — an explicit enterprise statement such as「不適用政府採購法」now controls `--track auto`; a known budget no longer implies fixed-price treatment without explicit fixed-price／fixed-fee wording.
+
+### Changed
+- **SkillOps governance** — frontmatter metadata now uses compact JSON with discovery fields; lifecycle archetype is `general`; all runtime and governance assets have point-of-use references (`orphan 35 → 0`).
+- **Frozen benchmark** — adds an 8-case development／held-out accuracy benchmark and a reusable stdlib-only runner. On identical cases, baseline `rfp_lint-7` scored 0/8 and candidate `rfp_lint-8` scored 8/8.
+- **Regression suite** — 17 → 21 deterministic selftests; regression gates now include the eight newly proven defects and guards.
+- **Lifecycle** — version moves to published `2026.8.28`; `2026.6.25` remains the prior rollback release.
+
+### Validation
+- SkillOps evaluate／revise／optimize／package／publish + security gates — PASS
+- `rfp_lint_selftest.py` — 21 cases PASS
+- frozen linter benchmark — development 4/4 and first held-out run 4/4 PASS
+- starter output — 20/20, 0 rule violations; raw skeleton — EXPECTED FAIL
+- legal-rule official check — all three sources were re-fetched on 2026-08-28; current text still supports §10 20% and §16/§17 20%–50%, the information-service §5／計費 rules, and the committee composition rules
+
 ## [2026.6.25] — Published
 
 A SkillOpt-style optimization pass on the deterministic scorer: reproduce the 2026.6.16 baseline → adversarial rollout against `rfp_lint.py` → two bounded fixes → held-out validation + final-test gate. Linter `rfp_lint-6 → rfp_lint-7`. No `SKILL.md` / routing / reference / task-eval change — only the eval-table compliance rules now parse weights correctly.

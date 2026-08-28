@@ -13,9 +13,9 @@ This file records source provenance for facts that drive routing, legal complian
 
 | Source | URL | Checked | Revision used | Used for |
 |---|---|---:|---|---|
-| 最有利標評選辦法 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030080 | 2026-06-16 | 民國 114 年 01 月 21 日 | 評選項目、評定方式、價格權重 20%-50%、簡報 / 詢答 20% 上限、評選規則公告後不得變更 |
-| 機關委託資訊服務廠商評選及計費辦法 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030078 | 2026-06-16 | 民國 114 年 05 月 23 日 | 資訊服務範圍、招標文件應載事項、資訊服務評審項目、計費三法、公費 / 管理費 / 預付款上限 |
-| 採購評選委員會組織準則 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030103 | 2026-06-16 | 民國 115 年 05 月 08 日 | 評選委員會 5 人以上、專家學者不少於 1/3、外聘委員限制、召集人資格 |
+| 最有利標評選辦法 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030080 | 2026-08-28 | 民國 114 年 01 月 21 日 | 評選項目、評定方式、價格權重 20%-50%、簡報 / 詢答 20% 上限、評選規則公告後不得變更 |
+| 機關委託資訊服務廠商評選及計費辦法 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030078 | 2026-08-28 | 民國 114 年 05 月 23 日 | 資訊服務範圍、招標文件應載事項、資訊服務評審項目、計費三法、公費 / 管理費 / 預付款上限 |
+| 採購評選委員會組織準則 | https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030103 | 2026-08-28 | 民國 115 年 05 月 08 日 | 評選委員會 5 人以上、專家學者不少於 1/3、外聘委員限制、召集人資格 |
 
 ## Linter-backed legal rules
 
@@ -25,14 +25,18 @@ This file records source provenance for facts that drive routing, legal complian
 | `presentation_weight` | major | 最有利標評選辦法 §10 | Applies to government-track RFPs only. |
 | `price_weight` > 50% | blocker | 最有利標評選辦法 §16 / §17 | Applies to government-track RFPs when price is included in scoring or ranking. |
 | `price_weight` < 20% | blocker unless fixed-price | 最有利標評選辦法 §16 / §17 and fixed-price exception | Fixed-price government cases may be below 20% only when the RFP explicitly states fixed-price / fixed-fee treatment. |
-| `weight_sum` | major | 評選矩陣 completeness rule | Applies whenever an evaluation table has percentage weights. |
+| `weight_sum` | major | 評選矩陣 completeness rule | Applies to the declared weight / score column in percentage or 100-point evaluation tables. |
 | `out_of_scope_mention` | warning (advisory) | Skill quality rule | V6: a mandatory-section keyword found only in a「不處理／不適用」context; advisory only, prescriptive 不得／禁止 prohibitions are excluded. |
 | missing `committee` (escalated) | blocker on gov 最有利標/資服, else major (gov) | 採購評選委員會組織準則 | V6 conditional severity: a government most-advantageous-tender / information-service case with no 評選委員會/評選方式 is a legality Blocker. |
 | missing `exit` (escalated) | blocker when 個資/雲端/關鍵系統 present | 個資法委託處理 + CLM exit best practice | V6 conditional severity: outsourced sensitive data with no return/erase clause. |
 | missing `locale` (escalated) | blocker on gov + sensitive | 資料落地 / 跨境揭露 | V6 conditional severity. |
 | missing `banlist` (escalated) | major on government track | 公部門禁用陸製/陸籍實務 | V6 conditional severity; enterprise stays minor. |
 
+Linter `rfp_lint-8` reads the declared item and weight columns, so percentages inside scoring formulas or notes do not alter price, presentation, or total-weight findings. It also requires explicit fixed-price / fixed-fee wording (or `--fixed-price`) before applying the below-20% exception; a known budget alone is not sufficient evidence.
+
 > **2026-06-16 live verification**: the three legal sources above were re-fetched from 全國法規資料庫 and their 修正日期 confirmed (114/01/21, 114/05/23, 115/05/08); page text also confirmed the 20%–50% price band, ≤20% simulation cap, §5 應載事項 (13 款), 公費 ≤25% / 管理費 ≤100% / 預付 ≤30%, and committee composition (5+ 人、外聘 ≥1/3、召集人一級主管以上). Linter grader at this check: `rfp_lint-6`.
+
+> **2026-08-28 live verification**: 全國法規資料庫再次確認《最有利標評選辦法》修正日期仍為民國 114/01/21，§10 簡報 / 詢答上限與 §16/§17 價格 20%–50% 規則未變；《機關委託資訊服務廠商評選及計費辦法》修正日期仍為民國 114/05/23，§5 招標文件 13 款事項、§13 計費三法及現行費用上限未變；《採購評選委員會組織準則》修正日期仍為民國 115/05/08，委員 5 人以上與專家學者至少 1/3 規則未變。三個來源下次 90 日定期查核日為 2026-11-26；若發布晚於該日，須先重新查核。
 
 ## Public case examples
 

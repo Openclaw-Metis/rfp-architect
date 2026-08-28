@@ -1,0 +1,40 @@
+{
+  "artifact_type": "benchmark-summary",
+  "source_path": "release/benchmark-smoke-20260828.json",
+  "source_sha256": "fc9e1a760ccda4738811b371cd37d975da0864b7b4c003c7a666febd79dd031c",
+  "metadata": {
+    "skill_version": "2026.8.28",
+    "git_commit": "5de2140",
+    "host": "local/python3",
+    "model": "none-deterministic",
+    "temperature": null,
+    "grader_version": "rfp_lint-8",
+    "run_timestamp": "2026-08-28T00:00:00Z",
+    "gate_type": "frozen-deterministic-comparison"
+  },
+  "results": {
+    "baseline": {
+      "version": "2026.6.25",
+      "grader_version": "rfp_lint-7",
+      "pass_rate": 0.0,
+      "cases": 8
+    },
+    "candidate": {
+      "version": "2026.8.28",
+      "grader_version": "rfp_lint-8",
+      "pass_rate": 1.0,
+      "cases": 8
+    },
+    "paired_delta": 1.0,
+    "development": "4/4 PASS",
+    "held_out_first_run": "4/4 PASS",
+    "rfp_lint_selftest": "21/21 PASS",
+    "skillops_required_gates": "PASS"
+  },
+  "decision": "ACCEPT",
+  "notes": [
+    "The comparison uses identical frozen inputs and an exact behavioral scorer; no model calls are involved.",
+    "Version 2026.8.28 passed the release gates and is the published release candidate represented by this evidence.",
+    "A0030080, A0030078 and A0030103 were live-verified against the official source on 2026-08-28; re-check after 2026-11-26."
+  ]
+}

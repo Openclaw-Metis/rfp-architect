@@ -2,6 +2,47 @@
 
 This file is release evidence for the current skill version. It records mechanical gate results and must be updated whenever `SKILL.md`, scripts, references, eval assets, or release artifacts change.
 
+## Release - 2026-08-28 (version 2026.8.28, status: published)
+
+Audit date: 2026-08-28. Current version: `2026.8.28`. Lifecycle status: **published**; the prior rollback release is `2026.6.25`. Linter grader: `rfp_lint-8`.
+
+Primary objective: bring the skill onto the current SkillOps contract, then correct empirically reproduced linter defects with a frozen development／held-out comparison and publish the fully gated result.
+
+### Governance and instruction surface
+
+- Frontmatter metadata now uses compact JSON and includes author, language, category and short description.
+- Lifecycle archetype is `general`; all 35 existing runtime／governance files plus the new benchmark assets have point-of-use references from `SKILL.md`.
+- SkillOps format and reference gates are clean. The final instruction-control audit has 0 findings and requires no manual review. Two non-blocking consistency notices remain because `deep-research` and `cc-designer` are external portfolio handoff targets rather than files vendored into this repository.
+
+### `rfp_lint-8` bounded changes
+
+- Parse Markdown evaluation tables by their declared item and weight columns. Percentages in formula／notes cells no longer become price weights or inflate the total.
+- Accept percentage and 100-point matrices, generic／nested Chinese evaluation headings, and English evaluation headings.
+- Make an explicit enterprise exclusion control `--track auto`; require explicit fixed-price／fixed-fee wording or `--fixed-price` before applying the under-20% exception.
+- Add a stdlib-only benchmark runner and eight frozen cases. On identical inputs, `rfp_lint-7` scored 0/8 and `rfp_lint-8` scored 8/8; development was 4/4 and the first held-out run was 4/4.
+
+### Final validation
+
+- `python3 -m compileall -q scripts` — PASS
+- `python3 scripts/rfp_lint_selftest.py` — PASS (21 cases)
+- `python3 scripts/run_linter_benchmark.py --split all` — PASS (8/8)
+- `python3 scripts/rfp_lint.py examples/starter/output.md --track government` — PASS (20/20, 0 rule violations)
+- `python3 scripts/rfp_lint.py assets/templates/rfp-skeleton.md --track government` — EXPECTED FAIL (placeholder guard observed)
+- `python3 scripts/audit_release_evidence.py . --json` — PASS (benchmark SHA-256, embedded summary and source commit traceability)
+- SkillOps evaluate／revise／optimize／package／publish + required security gates — PASS; instruction control 0 findings; security scan 45 files, 0 errors, 0 warnings
+- Remote push／tag／release authorization was explicitly provided on 2026-08-28.
+
+### Legal freshness and publish boundary
+
+- 2026-08-28 official check:《最有利標評選辦法》revision remains 114/01/21 and the encoded §10, §16 and §17 limits are unchanged;《機關委託資訊服務廠商評選及計費辦法》revision remains 114/05/23 and the checked §5／計費 rules are unchanged;《採購評選委員會組織準則》revision remains 115/05/08 and the checked composition rules are unchanged.
+- All three official legal sources are fresh through the next 90-day review date, 2026-11-26. If publish occurs after that date, re-run the official check first.
+- Remote release authorization was recorded before the publish gate and remote mutation.
+
+### Rollback and residual risk
+
+- Rollback: return to published commit `fc71766` / version `2026.6.25`, or revert the local 2026.8.28 commits.
+- Residual risk: `rfp_lint.py` remains a deterministic first-pass linter; presence and table parsing do not replace the semantic review rubric.
+
 ## Release - 2026-06-25 (version 2026.6.25, status: published)
 
 Audit date: 2026-06-25. Current version: `2026.6.25`. Lifecycle status: **published** (`last_released_at: 2026-06-25`). Linter grader: `rfp_lint-7`.

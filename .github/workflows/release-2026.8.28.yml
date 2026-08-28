@@ -1,0 +1,49 @@
+name: Publish rfp-architect 2026.8.28
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-2026.8.28.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > "$RUNNER_TEMP/release-notes.md" <<'EOF'
+          **rfp-architect 2026.8.28** upgrades the deterministic scorer from `rfp_lint-7` to `rfp_lint-8` and modernizes the skill for the current SkillOps contract.
+
+          ### Highlights
+          - Column-aware Markdown evaluation-table parsing; scoring formulas no longer create false price weights.
+          - Percentage and 100-point matrices plus generic, nested Chinese, and English evaluation headings.
+          - Correct enterprise-track exclusions and explicit fixed-price/fixed-fee handling.
+          - Frozen 8-case benchmark and reusable stdlib-only benchmark runner.
+          - SkillOps governance modernization with point-of-use references and zero orphan assets.
+
+          ### Release gates
+          - `rfp_lint_selftest.py`: 21/21 PASS
+          - Frozen benchmark: `rfp_lint-7` 0/8 → `rfp_lint-8` 8/8
+          - Starter output: 20/20, 0 rule violations
+          - Skeleton placeholder guard: EXPECTED FAIL
+          - SkillOps evaluate/revise/optimize/package/publish + security: PASS
+          - Instruction control: 0 findings
+          - Security: 45 files, 0 errors, 0 warnings
+          - Release evidence traceability: PASS
+
+          Taiwan procurement sources A0030080, A0030078, and A0030103 were live-verified on 2026-08-28. Next review: 2026-11-26.
+
+          Full details: `CHANGELOG.md` and `skill/rfp-architect/references/readiness_report.md`.
+          EOF
+          gh release create v2026.8.28 \
+            --repo "${{ github.repository }}" \
+            --target "d240c9039818fccbd0a4e0ad54e643d120f63924" \
+            --title "rfp-architect 2026.8.28 — rfp_lint-8" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"

@@ -7,7 +7,7 @@
 - Primary host(s)：Claude Code、OpenClaw（agent-skills 相容）。
 - Secondary host(s)：其他 agent-skills 相容 host。
 - Unsupported host(s)：無特定不支援；但 `rfp_lint.py` 需 Python 3 環境（無 Python 3 時改以 `review-rubric.md` 人工檢核，見 SKILL.md `<tool_rules>`）。
-- Core portable surface：skill + scripts（`SKILL.md` + `references/` + `assets/templates/` + `scripts/rfp_lint.py` 為單一真實來源）。
+- Core portable surface：skill + scripts（`SKILL.md` + `references/` + `assets/templates/` + `scripts/rfp_lint.py` + `scripts/rfp_extract.py` 為單一真實來源）。
 - Host adapters / wrappers needed：無；純 skill folder。
 - State / persistence path：本 skill 無持久狀態；產出的 RFP 草稿寫到使用者指定路徑或工作區，不寫回 skill folder。
 
@@ -72,12 +72,13 @@ Qualitative:
 - Maximum under-trigger failures：direct trigger 漏觸發 0。
 - Maximum over-trigger failures：negative（RFQ / 通用寫作）誤觸發 0。
 - Government compliance regression：非固定價格政府案價格 <20% 或 >50% 必須 fail；固定價格給付案價格 <20% 可通過但須提示文件明載固定價格；政府案簡報 / 詢答 >20% 必須 fail；配分合計非 100% 必須 fail；政府案缺評選委員會 / 退場（涉個資 / 雲端）必須升級為 Blocker。
-- Linter accuracy regression：`rfp_lint-8` 必須正確處理企業軌否定語、固定價格明示、一般 / 巢狀中英文評選標題、百分比 / 100 分制權重欄，以及與權重分欄的計分公式百分比。
+- Linter accuracy regression：`rfp_lint-9` 必須在任何標題措辭、純文字標題、跨頁表格、合併儲存格與 docx / odt 下讀到評選配分；讀懂百分之六十與全形數字；固定價格須有宣告；公式、低價說明、SLA、付款與等第表不得當成配分；政府案未載配分、評定方式、合格判定或委員會組成不足時失敗。
 
 ### Frozen linter benchmark
-- 修改 parser 前先固定 `assets/evals/linter_benchmark.json` 的 development／held-out cases；先跑 baseline development，再做 bounded candidate edit。
+- 修改 parser 前先固定 `assets/evals/linter_benchmark.json` 的 development／held-out cases；先跑 baseline development，再做 bounded candidate edit。既有案例不改標籤，只新增。
 - Candidate development 全綠後才執行 held-out；看過 held-out 結果後不再回頭調整同一候選的 linter 邏輯。
-- 執行命令：`python3 scripts/run_linter_benchmark.py --split development|held_out|all --json`。相同 benchmark 下 baseline 與 candidate 都保留 grader version、case status 與 pass rate。
+- 執行命令：`python3 scripts/run_linter_benchmark.py --split development|held_out|all --json`。相同 benchmark 下 baseline 與 candidate 都保留 grader version、case status 與 pass rate。比較舊版時以 `--module <舊版 rfp_lint.py>` 指定，runner 用同一份草稿與文件模式。
+- held-out 由維護者撰寫，不是獨立樣本。發版前另以公開招標文件的真實表格與句型做現場比對，並把發現的寫法寫成 selftest；真實文件全文不進 repo。
 
 ### Feedback loop
 - Common failure signals：產出漏掉台灣在地條款、或 review 只給泛泛建議。
@@ -86,7 +87,7 @@ Qualitative:
 ### Model / routing checks
 - GPT-style prompt pass：逐章節 / 逐 rubric 明確執行。
 - Reasoning-model pass：給目標與約束即可穩定產出。
-- Neighbor-skill confusion：與 deep-research（研究報告）、cc-designer（排版）界線清楚。
+- Neighbor-skill confusion：與 deep-research-metis（研究報告）、slide-studio 與 cc-designer（排版）、spec-organizer（內部開發規格）界線清楚。
 
 ### Host compatibility checks
 - Primary host smoke tests：Claude Code / OpenClaw 載入後可執行 write 與 review。
@@ -106,6 +107,7 @@ Qualitative:
 
 - Packaging：以 skill-creator-advanced 工具鏈的打包腳本封裝為 .skill（封裝工具不在本 skill folder 內）
 - 核心 skill folder 為單一真實來源；不要為單一 host fork 內容
+- 安裝時 `skill/rfp-architect/` 的內容要放在 skills 目錄下的 `rfp-architect/` 根層；把整個 repo 放進去時根目錄沒有 `SKILL.md`，host 不會發現這個 skill
 - 支援 host、權限、approval 邊界記錄在 skill folder 外
 - repo-level `README.md` 放本 skill folder 之外；packaged runtime 不含 README
 
@@ -117,21 +119,28 @@ Qualitative:
 - Symptom：review 只給泛泛建議、無定位。
   - Cause：未套用 `review-rubric.md` 的 finding 格式。
   - Fix：每項 finding 套 `[嚴重度] 位置 — 問題 / 理由 / 修正`，並引用 `rfp_lint.py` 回傳的行號 / 證據片段。
-- Symptom：linter 命中關鍵字但內容其實是「不處理 / 不適用」。
-  - Cause：keyword presence 不等於品質；v6 已加 out-of-scope 否定語**警示**（advisory），但不硬性 fail。
+- Symptom：linter 命中關鍵字但內容其實是「不處理 / 不適用 / 另行約定」。
+  - Cause：keyword presence 不等於品質；v6 起有 out-of-scope **警示**（advisory），v9 涵蓋另行約定，但不硬性 fail。
   - Fix：review 時依 `weak_hit` 警示人工複核該章節是否真的具備。
+- Symptom：linter 結束碼 2 或出現 `input_too_short`。
+  - Cause：檔案讀不到、PDF 未轉文字、舊版 .doc、掃描檔沒有文字層，或 Windows PowerShell 5.1 以 ASCII 傳管線把中文變成問號。
+  - Fix：依錯誤訊息改用 docx / odt / 純文字，PDF 先取出文字經 stdin 傳入，掃描檔先 OCR，PowerShell 先設定 `$OutputEncoding` 或改傳檔案路徑；此時沒有審查結果，不得回報通過或失敗。
+- Symptom：真實文件的評選表沒有被讀到。
+  - Cause：表格沒有權重欄標題，或 PDF 轉出後表格被拆得無法辨識。
+  - Fix：看 `rule_findings` 是否有 `evaluation_weights`；把新寫法加入 selftest 與 benchmark development，再調整 `_WEIGHT_HEADER` 或 `_ITEM_HEADER`。
 
 ## Resources（完整資源目錄）
 
-- `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用；v8 採欄位感知配分解析，並保留 v6 的證據定位、否定語警示與條件式嚴重度）。
-- `scripts/rfp_lint_selftest.py`：linter 21 個高風險規則回歸測試。
+- `scripts/rfp_lint.py`：RFP 章節 / 在地條款完整度初篩（write 與 review 共用；v9 掃描全文表格並檢查應載事項，保留 v6 的證據定位、否定語警示與條件式嚴重度）。
+- `scripts/rfp_extract.py`：以標準函式庫讀取 docx、odt 與 UTF-8 / UTF-16 / Big5 文字，表格轉成 Markdown；PDF 與舊版 .doc 拒絕並說明替代方式。
+- `scripts/rfp_lint_selftest.py`：linter 高風險規則與檔案輸入回歸測試。
 - `scripts/run_linter_benchmark.py`：執行 frozen development／held-out linter accuracy benchmark。
 - `scripts/audit_release_evidence.py`：release evidence traceability 檢查。
 - `references/rfp-anatomy.md`：文件家族與 11 必備章節、需求工程、撰寫流程。
-- `references/taiwan-procurement.md`：招標 / 決標 / 異質採購 / 最有利標 / 評選委員會 / 三種評定方式 / 序位法 / 等標期 / 價格 20–50% 區間 / 資訊服務委外專法（§8）。
-- `references/clause-library.md`：台灣在地與契約條款庫（A–N 在地 / 契約條款；O–R AI / 資料治理 / 雲端韌性 / 供應鏈）。
-- `references/info-service-article5-map.md`：《機關委託資訊服務廠商評選及計費辦法》§5 應載事項 → RFP 章節 → linter check → review 嚴重度對照。
-- `references/review-rubric.md`：審查心法、審查清單、嚴重度、八大常見錯誤、失敗根因、finding 格式。
+- `references/taiwan-procurement.md`：招標 / 決標路徑 / 異質採購 / 最有利標 / 評選委員會 / 評定方式 / 序位法 / 金額級距與等標期 / 釋疑異議 / 價格 20–50% 區間 / 工程會配分範例 / 資訊服務委外專法（§8）/ 應載事項清單（§9）。
+- `references/clause-library.md`：台灣在地與契約條款庫（A–N 在地 / 契約條款；O–R AI / 資料治理 / 雲端韌性 / 供應鏈；S 資通系統委外資安事項）。
+- `references/info-service-article5-map.md`：《機關委託資訊服務廠商評選及計費辦法》§5 得載事項 → RFP 章節 → linter check → review 嚴重度與獨立法源對照。
+- `references/review-rubric.md`：審查心法、審查清單、嚴重度、投標廠商立場、八大常見錯誤、失敗根因、finding 格式。
 - `references/case-patterns.md`：委外失敗模式 → RFP 控制點對照（公開案例，非報告內容）。
 - `references/source-register.md`：法規、案例與數值規則來源登錄（URL、查核日、版本與 freshness policy）。
 - `assets/templates/rfp-skeleton.md`：write 模式的填空骨架（含法規版本標頭與 RTM / 交付 / 付款管理矩陣）。
@@ -143,4 +152,4 @@ Qualitative:
 - `policies/`：release / portability / retirement 政策。
 - `examples/`：example-as-test fixtures。
 - `assets/`：模板與 eval fixtures。
-- `assets/evals/linter_benchmark.json`：`rfp_lint-8` 的 8 個凍結準確度案例與預期行為。
+- `assets/evals/linter_benchmark.json`：54 個凍結準確度案例（development 29、held-out 25）與預期行為；前 8 例為 v1 原案例。

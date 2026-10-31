@@ -1,0 +1,73 @@
+{
+  "skill_name": "rfp-architect",
+  "version": "2026.10.31",
+  "status": "PASS",
+  "lifecycle_status": "published",
+  "generated_at": "2026-10-31T00:00:00Z",
+  "commit": "50227a9",
+  "checks": {
+    "rfp_lint_selftest": "PASS",
+    "frozen_linter_benchmark": "PASS (54/54; baseline 19/54)",
+    "real_document_forms": "PASS (6/6; baseline 1/6)",
+    "example_lint": "PASS (20/20; 0 rule violations; 0 warnings)",
+    "skeleton_placeholder_guard": "PASS (expected failure observed)",
+    "release_evidence_traceability": "PASS",
+    "skillops_revise": "PASS",
+    "skillops_evaluate": "PASS",
+    "skillops_security": "PASS",
+    "skillops_package": "PASS",
+    "skillops_publish": "PASS",
+    "skillops_optimize": "BLOCKED (benchmark_missing)",
+    "instruction_control": "PASS (0 findings; advisory)",
+    "legal_freshness": "PASS — official text checked 2026-10-31; next review 2027-01-29",
+    "remote_publish": "AUTHORIZED — explicit user request recorded 2026-10-31"
+  },
+  "benchmark": {
+    "path": "release/benchmark-smoke-20261031.json",
+    "embedded_summary": true
+  },
+  "benchmark_summary": {
+    "artifact_type": "benchmark-summary",
+    "source_path": "release/benchmark-smoke-20261031.json",
+    "source_sha256": "5cd06635d24bf15e7c110f5a25b996daed8bd2a13981ee656986af91c27ed20c",
+    "metadata": {
+      "skill_version": "2026.10.31",
+      "git_commit": "50227a9",
+      "host": "local/python3",
+      "model": "none-deterministic",
+      "temperature": null,
+      "grader_version": "rfp_lint-9",
+      "run_timestamp": "2026-10-31T00:00:00Z",
+      "gate_type": "frozen-deterministic-comparison"
+    },
+    "results": {
+      "baseline": {
+        "version": "2026.8.28",
+        "grader_version": "rfp_lint-8",
+        "pass_rate": 0.3519,
+        "cases": 54
+      },
+      "candidate": {
+        "version": "2026.10.31",
+        "grader_version": "rfp_lint-9",
+        "pass_rate": 1.0,
+        "cases": 54
+      },
+      "paired_delta": 0.6481,
+      "development": "29/29 PASS",
+      "held_out_first_run": "25/25 PASS",
+      "real_document_forms": "6/6 PASS (baseline 1/6)",
+      "skillops_required_gates": "PASS"
+    },
+    "decision": "ACCEPT",
+    "notes": [
+      "The comparison uses identical frozen inputs and an exact behavioral scorer; no model calls are involved.",
+      "Legal sources in references/source-register.md were checked against the official text on 2026-10-31; next review 2027-01-29.",
+      "SkillOps optimize stays BLOCKED by design: it needs a live benchmark, and none was run for this deterministic gate."
+    ]
+  },
+  "benchmark_summary_path": "release/benchmark-summary-2026.10.31.json",
+  "blocking_findings": [],
+  "publish_status": "PASS",
+  "remaining_publish_requirements": []
+}

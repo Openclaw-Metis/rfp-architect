@@ -48,5 +48,35 @@
     "id": "non-trigger-research-report",
     "query": "幫我做一份委外 RFP 最佳實務深度研究報告，要引用十幾個來源",
     "should_trigger": false
+  },
+  {
+    "id": "trigger-bidder-review-zh",
+    "query": "我們是投標廠商，幫我看這份招標需求書有哪些風險要先釋疑",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-service-proposal-doc-zh",
+    "query": "幫我起草資訊系統委外的服務建議書徵求文件和評選須知",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-advise-rank-zh",
+    "query": "資訊服務案的序位法跟合格分數要怎麼訂",
+    "should_trigger": true
+  },
+  {
+    "id": "trigger-en-review-docx",
+    "query": "Review this request for proposal docx for our government software outsourcing tender.",
+    "should_trigger": true
+  },
+  {
+    "id": "non-trigger-dev-spec",
+    "query": "把這個 App 想法整理成內部工程師用的開發 spec",
+    "should_trigger": false
+  },
+  {
+    "id": "non-trigger-official-letter",
+    "query": "幫我寫一份函文通知廠商開會時間",
+    "should_trigger": false
   }
 ]

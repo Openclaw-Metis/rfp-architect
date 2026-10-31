@@ -462,6 +462,198 @@
         "納入幻覺 / 錯誤率、人工覆核、訓練資料使用、log 保存等 AI 條款",
         "評選含一致評估量表，且不臆造模型效能數值"
       ]
+    },
+    {
+      "id": 23,
+      "name": "bidder-side-review-clarification",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "bidder-side",
+        "happy-path"
+      ],
+      "prompt": "我們是軟體廠商，收到一份政府資訊系統標案的需求書，驗收只寫「機關滿意為止」，智財寫「另行約定」。幫我看有什麼風險、要不要投。",
+      "expected_output": "以 review 模式的投標廠商立場回答：結論寫「釐清前不宜投標」；findings 的最後一段是建議行動（可直接送出的釋疑問題全文），並寫出釋疑與異議期限；不寫成要求機關改稿的修正條文。",
+      "files": [],
+      "expectations": [
+        "標示投標廠商立場，不走乙方建議書撰寫",
+        "finding 轉成釋疑問題、異議或報價假設，含期限",
+        "異議期限引用法 §75：等標期 1/4，不少於 10 日"
+      ]
+    },
+    {
+      "id": 24,
+      "name": "docx-input-review",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "file-input",
+        "regression"
+      ],
+      "prompt": "幫我審查 C:\\work\\採購\\需求說明書.docx，這是我們機關資訊服務案的招標文件。",
+      "expected_output": "直接以 rfp_lint.py 讀取 docx，取得表格內的配分與規則結果，再依 rubric 審查；不要求使用者先轉成 Markdown。",
+      "files": [],
+      "expectations": [
+        "直接把 docx 傳給 linter",
+        "findings 引用行號或章節定位",
+        "不要求使用者手動轉檔"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "scanned-pdf-not-treated-as-pass",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "failure-mode",
+        "file-input"
+      ],
+      "prompt": "幫我審查這份 RFP 掃描檔 PDF，全部都是圖片，擷取不到文字。",
+      "expected_output": "揭露未能讀到全文，請使用者提供文字版或 OCR 結果；不得把 linter 的空結果或 input_too_short 當成審查結論。",
+      "files": [],
+      "expectations": [
+        "明示機械檢核未涵蓋全文",
+        "不對內容下結論",
+        "提出可行的下一步（文字版或 OCR）"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "article5-may-not-must",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "gov-procurement",
+        "legal-precision",
+        "regression"
+      ],
+      "prompt": "這份政府資訊服務案 RFP 沒寫機關現有資訊作業環境，這算違反資訊服務評選及計費辦法第 5 條嗎？",
+      "expected_output": "說明 §5 是「得視個案特性及實際需要載明」，缺漏不等於違法；以 Major 品質缺漏處理（廠商無從評估介接、報價失真），並區分有「應」字法源的事項（§21 智財、§11 議價方式、最有利標評選辦法 §4、§16–§18）。",
+      "files": [],
+      "expectations": [
+        "不把 §5 缺漏寫成違法",
+        "區分應載與得載",
+        "仍建議補上並說明為何影響報價"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "statutory-items-missing",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement",
+        "adversarial",
+        "regression"
+      ],
+      "prompt": "審查這份最有利標 RFP：配分表價格 30% 合計 100%，評選委員會 7 人。但全文沒寫用什麼方式評定，也沒寫幾分算合格，還寫廠商沒來簡報就不予評選。",
+      "expected_output": "回報缺評定方式（§4、§11）、缺合格判定（§16、§17）、未出席簡報即排除違反 §10 第 4 項；不因配分合法而放行。rfp_lint 對應 award_method、passing_score、presentation_absence。",
+      "files": [],
+      "expectations": [
+        "指出評定方式未載明",
+        "指出合格分數應載明，不說成機關可自訂是否載明",
+        "指出未出席簡報不影響投標文件有效性"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "third-party-security-test-threshold",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "blocker-detection",
+        "gov-procurement",
+        "security",
+        "regression"
+      ],
+      "prompt": "幫我審查這份 1,500 萬元的客製化系統開發 RFP，機關是公務機關，資安章節只要求廠商自己做弱點掃描。",
+      "expected_output": "依資通安全管理法 §10 與施行細則 §7 指出：委託金額達 1,000 萬元，委託機關應自行或另行委託第三方進行安全性檢測，廠商自評不足；缺機關側規劃屬 Blocker，並列出資安人力、複委託、通報、終止與稽核等委外事項。",
+      "files": [],
+      "expectations": [
+        "引用 1,000 萬元第三方檢測門檻",
+        "指出責任在委託機關側",
+        "對照條款庫 S 節補齊委外事項"
+      ]
+    },
+    {
+      "id": 29,
+      "name": "pdpa-amendment-not-in-force",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "indirect",
+      "coverage_tags": [
+        "consult",
+        "should-trigger",
+        "legal-precision",
+        "no-fabrication"
+      ],
+      "prompt": "RFP 的個資事故通報條款，可以直接寫依個資法第 12 條 72 小時內通報主管機關嗎？",
+      "expected_output": "說明 114 年 11 月 11 日修正條文施行日期由行政院定之，查核時尚未生效，通報時限待子法；72 小時只能作為契約約定給機關的通報期限，不是法定時限。提醒發包前查核。",
+      "files": [],
+      "expectations": [
+        "不把未生效條文當現行法",
+        "區分契約約定與法定時限",
+        "附查核日與發包前確認提醒"
+      ]
+    },
+    {
+      "id": 30,
+      "name": "brand-lock-review",
+      "type": "functional",
+      "language": "zh",
+      "trigger_class": "direct",
+      "coverage_tags": [
+        "review",
+        "should-trigger",
+        "gov-procurement",
+        "semantic-only"
+      ],
+      "prompt": "審查這份政府資訊系統 RFP，第五章寫「資料庫須採用 Oracle 19c，伺服器須為 Dell PowerEdge」，全文沒有或同等品。",
+      "expected_output": "依政府採購法 §26 第 3 項判定規格綁標風險（無法精確說明者須註明或同等品），列 Blocker 並提供改寫；說明 linter 不檢查此項，由 rubric 判定。若是既有環境介接需求，改寫成相容性要求。",
+      "files": [],
+      "expectations": [
+        "指出 §26 商標限制",
+        "提供或同等品或功能性改寫",
+        "區分介接既有環境與指定採購品牌"
+      ]
+    },
+    {
+      "id": 31,
+      "name": "negative-internal-dev-spec",
+      "type": "trigger",
+      "language": "zh",
+      "trigger_class": "negative",
+      "coverage_tags": [
+        "should-not-trigger",
+        "overlap-neighbor",
+        "near-miss"
+      ],
+      "prompt": "我有一個 App 點子，幫我整理成給我們內部工程師開發用的 spec 和驗收條件。",
+      "expected_output": "不觸發本 skill（內部開發規格，不對外徵求廠商），交給規格整理能力。",
+      "files": [],
+      "expectations": [
+        "不產出 RFP 章節",
+        "辨識為內部開發規格"
+      ]
     }
   ]
 }

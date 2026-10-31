@@ -11,7 +11,11 @@
     "failure-mode",
     "adversarial"
   ],
-  "required_eval_languages": ["zh", "en", "mixed"],
+  "required_eval_languages": [
+    "zh",
+    "en",
+    "mixed"
+  ],
   "required_rule_regressions": [
     "gov-price-over-50-fails",
     "gov-fixed-price-under-20-info",
@@ -30,10 +34,24 @@
     "points-without-percent-sign",
     "nested-evaluation-subheading",
     "explicit-fixed-price-low-weight",
-    "english-evaluation-heading"
+    "english-evaluation-heading",
+    "evaluation-table-found-under-any-heading",
+    "plain-text-and-pdf-weights-read",
+    "chinese-and-fullwidth-percent-read",
+    "fixed-price-needs-declaration",
+    "unknown-track-warns",
+    "unresolved-choice-bracket-fails",
+    "statutory-evaluation-items-required",
+    "committee-size-and-expert-share",
+    "presentation-absence-cannot-exclude",
+    "sla-payment-and-scale-tables-ignored",
+    "page-split-table-merged",
+    "merged-subrows-summed",
+    "docx-and-odt-tables-read",
+    "unreadable-input-exits-2"
   ],
   "notes": [
-    "deterministic_functional_pass_rate is enforced by scripts/rfp_lint_selftest.py (21 cases; rfp_lint-8), the frozen 8-case linter benchmark, starter example_lint, and skeleton expected-fail; this is the release gate for a knowledge+linter skill.",
+    "deterministic_functional_pass_rate is enforced by scripts/rfp_lint_selftest.py (rfp_lint-9), the frozen 54-case linter benchmark (development 29, held-out 25), starter example_lint, and skeleton expected-fail; this is the release gate for a knowledge+linter skill.",
     "max_time_increase_seconds / max_token_increase were retired in 2026.6.16: they assumed a paired LLM latency benchmark that was never instrumented for this artifact type (see references/readiness_report.md)."
   ]
 }

@@ -1,0 +1,59 @@
+{
+  "artifact_type": "scored-deterministic-comparison",
+  "skill_version": "2026.10.31",
+  "host": "local/python3",
+  "model": "none-deterministic",
+  "temperature": null,
+  "run_timestamp": "2026-10-31T00:00:00Z",
+  "grader_version": "rfp_lint-9",
+  "benchmark_id": "rfp-lint-table-context-and-statute-2026-10-31",
+  "benchmark_sha256": "2433693054b61b95ba1fc77b95a14f4bec4674213487ffafbc17273bf67480b5",
+  "budget": {
+    "model_calls": 0,
+    "external_calls": 0,
+    "runtime": "stdlib-only"
+  },
+  "baseline": {
+    "version": "2026.8.28",
+    "commit": "3e7d9dc",
+    "grader_version": "rfp_lint-8",
+    "passed": 19,
+    "total": 54,
+    "pass_rate": 0.3519
+  },
+  "candidate": {
+    "version": "2026.10.31",
+    "commit": "pending",
+    "grader_version": "rfp_lint-9",
+    "passed": 54,
+    "total": 54,
+    "pass_rate": 1.0
+  },
+  "splits": {
+    "development": {
+      "baseline": "5/29",
+      "candidate": "29/29"
+    },
+    "held_out": {
+      "baseline": "14/25",
+      "candidate_first_run": "25/25",
+      "candidate_scoring_changed_after_run": false
+    },
+    "real_document_forms": {
+      "baseline": "1/6",
+      "candidate": "6/6",
+      "note": "Forms from a PCC example and three public tender documents; documents not redistributed."
+    }
+  },
+  "delta": {
+    "pass_rate": 0.6481,
+    "model_calls": 0
+  },
+  "regression": {},
+  "decision": "ACCEPT",
+  "residual_risks": [
+    "Held-out cases share their author with the candidate; they are not an independent sample.",
+    "No live model run of the workflows and no live trigger eval.",
+    "Full-document false-positive rate on real RFPs is unmeasured."
+  ]
+}

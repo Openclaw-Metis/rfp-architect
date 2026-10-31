@@ -1,18 +1,18 @@
 {
-  "benchmark_id": "rfp-lint-table-and-context-2026-08-28",
-  "version": "1.0",
-  "skill_version": "2026.8.28",
+  "benchmark_id": "rfp-lint-table-context-and-statute-2026-10-31",
+  "version": "2.0",
+  "skill_version": "2026.10.31",
   "host": "local/python3",
   "model": "none-deterministic",
-  "run_timestamp": "2026-08-28T00:00:00Z",
-  "frozen_at": "2026-08-28",
+  "run_timestamp": "2026-10-31T00:00:00Z",
+  "frozen_at": "2026-10-31",
   "scorer": "exact behavioral contract",
   "metadata": {
     "host": "local/python3",
     "model": "none-deterministic",
     "temperature": null,
     "budget": "stdlib-only; zero model calls",
-    "stop_condition": "development passes before one held-out run"
+    "stop_condition": "development passes before one held-out run; v1 cases stay unchanged"
   },
   "cases": [
     {
@@ -27,7 +27,9 @@
       "expected": {
         "pass": true,
         "effective_track": "enterprise",
-        "forbidden_rules": ["price_weight"]
+        "forbidden_rules": [
+          "price_weight"
+        ]
       }
     },
     {
@@ -42,7 +44,9 @@
       "expected": {
         "pass": false,
         "effective_track": "government",
-        "rule_severities": {"price_weight": "blocker"}
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
       }
     },
     {
@@ -56,7 +60,9 @@
       },
       "expected": {
         "pass": false,
-        "rule_severities": {"price_weight": "blocker"}
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
       }
     },
     {
@@ -70,7 +76,10 @@
       },
       "expected": {
         "pass": true,
-        "forbidden_rules": ["price_weight", "weight_sum"]
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
       }
     },
     {
@@ -84,7 +93,9 @@
       },
       "expected": {
         "pass": false,
-        "rule_severities": {"price_weight": "blocker"}
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
       }
     },
     {
@@ -98,7 +109,9 @@
       },
       "expected": {
         "pass": false,
-        "rule_severities": {"price_weight": "blocker"}
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
       }
     },
     {
@@ -112,7 +125,9 @@
       },
       "expected": {
         "pass": true,
-        "rule_severities": {"price_weight": "info"}
+        "rule_severities": {
+          "price_weight": "info"
+        }
       }
     },
     {
@@ -126,7 +141,773 @@
       },
       "expected": {
         "pass": false,
-        "rule_severities": {"price_weight": "blocker"}
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-heading-topic-only",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 九、評選\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-committee-heading-before-table",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選委員會之組成方式\n由委員組成。\n## 配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-plain-text-headings",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "九、評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |",
+        "strip_headings": true
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-header-share-word",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 佔比 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-sequence-column-and-score-header",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 項次 | 內容 | 分數 |\n|---|---|---|\n| 1 | 技術 | 40 |\n| 2 | 價格 | 60 |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-prose-chinese-percent",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n價格所占比率為百分之六十，技術為百分之四十。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-prose-fullwidth-percent",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n價格配分６０％，技術配分４０％。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-two-row-bad-sum",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 30% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "weight_sum": "major"
+        }
+      }
+    },
+    {
+      "id": "dev2-no-weights-at-all",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n由評選委員會綜合評選。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "evaluation_weights": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-prose-formula-after-table",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n價格分數=最低報價/報價×100%"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
+      }
+    },
+    {
+      "id": "dev2-abnormally-low-prose",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n總標價低於底價 80% 者應提出說明；報價低於預算 80% 者亦同。"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
+      }
+    },
+    {
+      "id": "dev2-negated-fixed-price",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n本案非固定價格給付。\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 90% |\n| 價格 | 10% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-skeleton-note-is-not-fixed-price",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 90% |\n| 價格 | 10% |\n- 價格權重須落在 20%–50% 法定區間（固定價格給付案得低於 20%）。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-auto-exclusion-without-enterprise-marker",
+      "split": "development",
+      "track": "auto",
+      "fixture": {
+        "title": "本公司委外",
+        "pricing": "本公司委外開發，本案不適用政府採購法。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": true,
+        "effective_track": "enterprise",
+        "forbidden_rules": [
+          "price_weight"
+        ]
+      }
+    },
+    {
+      "id": "dev2-auto-article-exclusion-stays-government",
+      "split": "development",
+      "track": "auto",
+      "fixture": {
+        "title": "一般企業慣例參考",
+        "pricing": "本機關辦理；本案不適用政府採購法第58條。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "effective_track": "government",
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-auto-unknown-track-warns",
+      "split": "development",
+      "track": "auto",
+      "fixture": {
+        "title": "委外案",
+        "pricing": "廠商須報價。",
+        "evaluation": "## 配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "neutral"
+      },
+      "expected": {
+        "pass": true,
+        "effective_track": "unknown",
+        "rule_severities": {
+          "track_unknown": "warning"
+        }
+      }
+    },
+    {
+      "id": "dev2-choice-bracket-left",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n資安分級：【普／中／高】\n付費方式：【買斷 / 訂閱 / 用量】"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "placeholder": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-soft-placeholders-advisory",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n機關：○○機關；約定：＿＿"
+      },
+      "expected": {
+        "pass": true,
+        "rule_severities": {
+          "soft_placeholder": "warning"
+        }
+      }
+    },
+    {
+      "id": "dev2-ip-deferred-advisory",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "ip_deferred"
+      },
+      "expected": {
+        "pass": true,
+        "rule_severities": {
+          "out_of_scope_mention": "warning"
+        }
+      }
+    },
+    {
+      "id": "dev2-committee-of-three",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "committee_three"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "committee_size": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-external-share-below-third",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "committee_share"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "committee_size": "blocker"
+        }
+      }
+    },
+    {
+      "id": "dev2-award-method-missing",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "no_award_method"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "award_method": "major"
+        }
+      }
+    },
+    {
+      "id": "dev2-passing-score-missing",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "no_passing_score"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "passing_score": "major"
+        }
+      }
+    },
+    {
+      "id": "dev2-presentation-absence-disqualifies",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n廠商未出席簡報者不予評選。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "presentation_absence": "major"
+        }
+      }
+    },
+    {
+      "id": "dev2-merged-subrows-valid",
+      "split": "development",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 子項 | 配分 |\n|---|---|---|\n| 技術 | 架構 | 40 |\n|  | 安全 | 30 |\n| 價格 | 合理性 | 15 |\n|  | 成本分析 | 15 |"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
+      }
+    },
+    {
+      "id": "held2-chapter-heading-review-item-header",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "第九章 評選及決標\n| 序號 | 評審項目 | 配分比重 |\n|---|---|---|\n| 1 | 技術 | 45 |\n| 2 | 價格 | 55 |",
+        "strip_headings": true
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-prose-share-of-total",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選項目\n（三）價格：占總滿分百分之十五。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-not-adopting-fixed-price",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n本案不採固定價格給付。\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 85% |\n| 價格 | 15% |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-fixed-service-fee-declared",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "招標文件已訂明固定服務費用，廠商詳列費用組成。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 90% |\n| 價格合理性 | 10% |"
+      },
+      "expected": {
+        "pass": true,
+        "rule_severities": {
+          "price_weight": "info"
+        }
+      }
+    },
+    {
+      "id": "held2-auto-not-government-procurement",
+      "split": "held_out",
+      "track": "auto",
+      "fixture": {
+        "title": "本公司採購",
+        "pricing": "本案非政府採購，由本公司自行辦理。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 30% |\n| 價格 | 70% |"
+      },
+      "expected": {
+        "pass": true,
+        "effective_track": "enterprise",
+        "forbidden_rules": [
+          "price_weight"
+        ]
+      }
+    },
+    {
+      "id": "held2-auto-article-word-number",
+      "split": "held_out",
+      "track": "auto",
+      "fixture": {
+        "title": "案件說明",
+        "pricing": "招標機關辦理；本案不適用政府採購法第四十九條。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 40% |\n| 價格 | 60% |"
+      },
+      "expected": {
+        "pass": false,
+        "effective_track": "government",
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-sla-weight-table-not-evaluation",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。\n## 服務水準指標\n| 指標 | 權重 |\n|---|---|\n| 可用率 | 40% |\n| 回應時間 | 20% |",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "weight_sum",
+          "price_weight"
+        ]
+      }
+    },
+    {
+      "id": "held2-payment-table-not-evaluation",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。\n## 付款\n| 期別 | 付款比例 |\n|---|---|\n| 第一期 | 30% |\n| 第二期 | 30% |",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "weight_sum",
+          "price_weight"
+        ]
+      }
+    },
+    {
+      "id": "held2-low-bid-prose-control",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n廠商報價低於預算 70% 時應提出說明。"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
+      }
+    },
+    {
+      "id": "held2-committee-chinese-numeral",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "committee_three_zh"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "committee_size": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-working-group-three-control",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "working_group"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "committee_size"
+        ]
+      }
+    },
+    {
+      "id": "held2-external-two-of-nine",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "committee_two_of_nine"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "committee_size": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-absence-forfeits-bid",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n廠商未出席簡報者，視同放棄評選資格。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "presentation_absence": "major"
+        }
+      }
+    },
+    {
+      "id": "held2-absence-zero-score-control",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 60% |\n| 簡報 | 10% |\n| 價格 | 30% |\n廠商未出席簡報者，簡報項目以 0 分計。"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "presentation_absence"
+        ]
+      }
+    },
+    {
+      "id": "held2-choice-bracket-level",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n資安等級：【高／中】"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "placeholder": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-total-score-method-with-item-threshold",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |\n評定方式採總評分法，總評分未達 70 分者為不合格。",
+        "document_mode": "no_award_method"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "award_method",
+          "passing_score"
+        ]
+      }
+    },
+    {
+      "id": "held2-public-selection-no-weights",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "公開評選 資訊服務",
+        "pricing": "本案採公開評選，廠商須報價。",
+        "evaluation": "## 評選須知\n由評選委員會依建議書內容評選優勝廠商。"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "evaluation_weights": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-lowest-bid-no-award-method",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 評分及格最低標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "lowest_bid"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "award_method",
+          "passing_score"
+        ]
+      }
+    },
+    {
+      "id": "held2-subrows-at-cap-valid",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 子項 | 配分 |\n|---|---|---|\n| 技術 | 架構 | 50 |\n| 價格 | 總價 | 25 |\n|  | 分項 | 25 |"
+      },
+      "expected": {
+        "pass": true,
+        "forbidden_rules": [
+          "price_weight",
+          "weight_sum"
+        ]
+      }
+    },
+    {
+      "id": "held2-subrows-over-cap",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 子項 | 配分 |\n|---|---|---|\n| 技術 | 架構 | 40 |\n| 價格 | 總價 | 30 |\n|  | 分項 | 30 |"
+      },
+      "expected": {
+        "pass": false,
+        "rule_severities": {
+          "price_weight": "blocker"
+        }
+      }
+    },
+    {
+      "id": "held2-ip-settled-after-award",
+      "split": "held_out",
+      "track": "government",
+      "fixture": {
+        "title": "政府採購 最有利標",
+        "pricing": "政府採購，廠商須報價。",
+        "evaluation": "## 評選標準與配分\n| 評選項目 | 權重 |\n|---|---:|\n| 技術 | 70% |\n| 價格 | 30% |",
+        "document_mode": "ip_after_award"
+      },
+      "expected": {
+        "pass": true,
+        "rule_severities": {
+          "out_of_scope_mention": "warning"
+        }
       }
     }
   ]

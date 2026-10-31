@@ -2,6 +2,40 @@
 
 All notable changes to **rfp-architect** are recorded here. Versions use CalVer (`YYYY.M.D`).
 
+## [2026.10.31] — Published
+
+Legal-accuracy and real-document pass. Rechecks the encoded law against the official text, corrects what it overstated or missed, and upgrades the scorer from `rfp_lint-8` to `rfp_lint-9` after an adversarial replay found that a government draft with price at 60% could pass silently.
+
+### Fixed — legal content
+- **§5 is discretionary** — 《機關委託資訊服務廠商評選及計費辦法》§5 says 「得視個案特性及實際需要載明」. The skill called it 法定應載 throughout; findings now separate 得載 items from items with their own 應 basis (§21 intellectual property, §11 negotiation method, 《最有利標評選辦法》§4, §16–§18).
+- **Passing score is required** — §16／§17 require the tender documents to state 合格分數 or the pass／fail rule; the skill said an agency 「得另訂」 one.
+- **Presentation** — the rubric cited §14, which is the tie-break rule. §10 第 4 項 is now covered: missing a presentation does not affect bid validity, so it cannot exclude a bidder; scoring that item zero stays lawful.
+- **Price routes** — fixed-price treatment now cites §9, §12 and §15; the 「price not scored」 route is covered, where the 20–50% band does not apply.
+- **Security outsourcing** — clauses follow 《資通安全管理法》(114/09/24) §10, §11 and 施行細則 (115/01/05) §7, including the third-party security test the agency must arrange for core systems or contracts of NT$10 million or more. The former 「大陸廠牌」 clause now rests on 危害國家資通安全產品 and the national-security vendor regulation.
+- **Personal data** — clause M follows 施行細則 §8 and marks the 114/11/11 amendment as not yet in force, so 72 hours is a contract term, not a statutory limit.
+
+### Added
+- **`scripts/rfp_extract.py`** — reads docx, odt and UTF-8／UTF-16／Big5 text with the standard library, keeping tables as Markdown. PDF and legacy formats are refused with instructions.
+- **Bidder-side review** — findings become clarification questions, protest grounds with deadlines (法 §41, §75) and pricing assumptions, with their own verdict wording.
+- **Knowledge** — three procurement routes, the 應載事項 checklist, amount thresholds, waiting-period shortening, 整體委外 (§4, §6, §8), the official PCC weighting example for seven service types, clause S, and AI Basic Act duties for government use.
+- **Evals** — task evals 22 → 31; trigger evals 10 → 16.
+
+### Changed — `rfp_lint-9`
+- **Every table is scanned** — a table cannot be skipped because of its heading wording. Evaluation tables are recognised by heading chain, header or a priced row; SLA, payment and grading-scale tables stay out. Pieces split across a page are merged, and merged cells carry their label down.
+- **Prose** — reads 百分之六十 and full-width digits, and only when no table exists; formulas and abnormally-low-bid sentences no longer become weights.
+- **New rules** — `evaluation_weights`, `award_method`, `passing_score`, `committee_size`, `presentation_absence`, plus advisory `soft_placeholder`, `track_unknown` and `input_too_short`. Rule findings carry line numbers.
+- **Stricter blocker keywords** — bare 必要 no longer satisfies 功能需求 and bare 授權 no longer satisfies 智財.
+- **Context** — fixed-price treatment needs a declaration, so 非固定價格 and notes explaining the exception no longer unlock the low-price path. An exclusion of 政府採購法 selects the enterprise track unless it names one article. Unresolved choices such as `【普／中／高】` fail as placeholders. 「另行約定」 raises the out-of-scope advisory.
+- **CLI** — exit code 2 with an instruction when input cannot be read, including stdin that Windows PowerShell 5.1 turned into question marks. Tracebacks are gone.
+
+### Packaging
+- Frontmatter moves `version` into `metadata`, which the current SkillOps format gate requires, and adds `license`.
+- README states the install layout. Installing the whole repository left no root `SKILL.md`, so the host could not discover the skill.
+
+### Upgrade notes
+- A government draft that passed `rfp_lint-8` can now fail when it lacks 評定方式 or 合格分數. This is intended.
+- JSON output keeps its existing keys and adds `pending_confirmations`, `source_format`, and `line` on rule findings. Exit code 2 is new.
+
 ## [2026.8.28] — Published
 
 Modernizes the skill for the current SkillOps contract and upgrades the deterministic scorer from `rfp_lint-7` to `rfp_lint-8`.

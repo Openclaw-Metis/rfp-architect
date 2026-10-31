@@ -35,6 +35,8 @@ SLA 服務水準 可用率 回應時間 罰則
 {evaluation}
 ## 評選委員會
 評選委員會 5 人以上 外聘 召集人 委員
+評定方式：序位法。
+總滿分 100 分，合格分數 70 分。
 ## 時程
 時程 里程碑 等標期 截止
 ## 契約：智財
@@ -52,6 +54,36 @@ SLA 服務水準 可用率 回應時間 罰則
 """
 
 
+AWARD_LINE = "評定方式：序位法。\n"
+PASSING_LINE = "總滿分 100 分，合格分數 70 分。\n"
+COMMITTEE_LINE = "評選委員會 5 人以上 外聘 召集人 委員"
+IP_LINE = "著作權 著作財產權 智財 授權"
+
+# Each mode rewrites the shared draft the same way for baseline and candidate.
+DOCUMENT_MODES = {
+    "neutral": ((COMMITTEE_LINE, "內部審查小組"), ("## 評選委員會", "## 審查小組"), ("等標期", "報價期")),
+    "ip_deferred": ((IP_LINE, "智財事項另行約定"),),
+    "ip_after_award": ((IP_LINE, "著作權歸屬於決標後另議"),),
+    "committee_three": ((COMMITTEE_LINE, "評選委員會由 3 人組成，外聘 召集人"),),
+    "committee_three_zh": ((COMMITTEE_LINE, "評選委員會置委員三人，外聘專家學者一人，召集人"),),
+    "committee_share": ((COMMITTEE_LINE, "評選委員會委員 7 人，其中外聘專家學者 2 人，召集人"),),
+    "committee_two_of_nine": ((COMMITTEE_LINE, "評選委員會委員 9 人，外聘專家學者 2 人，召集人"),),
+    "working_group": ((COMMITTEE_LINE, COMMITTEE_LINE + "\n工作小組 3 人協助評選作業"),),
+    "no_award_method": ((AWARD_LINE, ""),),
+    "no_passing_score": ((PASSING_LINE, ""),),
+    "lowest_bid": ((AWARD_LINE, ""), (PASSING_LINE, "")),
+}
+
+
+def build_document(fixture: dict) -> str:
+    text = BASE_DRAFT.format(**fixture)
+    for old, new in DOCUMENT_MODES.get(fixture.get("document_mode"), ()):
+        text = text.replace(old, new)
+    if fixture.get("strip_headings"):
+        text = text.replace("## ", "").replace("# ", "")
+    return text
+
+
 def load_linter(path: Path):
     spec = importlib.util.spec_from_file_location("rfp_lint_benchmark_target", path)
     if spec is None or spec.loader is None:
@@ -62,7 +94,7 @@ def load_linter(path: Path):
 
 
 def evaluate_case(module, case: dict) -> dict:
-    text = BASE_DRAFT.format(**case["fixture"])
+    text = build_document(case["fixture"])
     actual = module.lint(text, track=case.get("track", "auto"))
     expected = case["expected"]
     checks = {

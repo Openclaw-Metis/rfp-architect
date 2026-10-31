@@ -2,6 +2,52 @@
 
 This file is release evidence for the current skill version. It records mechanical gate results and must be updated whenever `SKILL.md`, scripts, references, eval assets, or release artifacts change.
 
+## Release - 2026-10-31 (version 2026.10.31, status: published)
+
+Audit date: 2026-10-31. Current version: `2026.10.31`. Lifecycle status: **published**; the prior rollback release is `2026.8.28`. Linter grader: `rfp_lint-9`.
+
+Primary objective: verify the encoded law against the official text, then fix what an adversarial replay and real tender documents showed the deterministic scorer getting wrong. Evidence level E2: repository files, adversarial replay, official legal text and public tender documents. There are no production failure logs, and transcripts only list the skill.
+
+### Control surfaces changed
+
+| Base failure | Control surface | Artifact | Expected action shift |
+|---|---|---|---|
+| Government draft with price at 60% passes when the heading, file format or number wording differs; valid drafts fail on formulas | deterministic executor | `scripts/rfp_lint.py` | False passes and false Blockers fall |
+| Real files cannot be read; a mangled pipe yields a wrong verdict | deterministic executor | `scripts/rfp_extract.py` | Review proceeds on docx and odt; unreadable input stops with exit 2 |
+| Review states discretionary items as legal requirements and misses required ones | external context | `references/taiwan-procurement.md`, `info-service-article5-map.md`, `review-rubric.md`, `clause-library.md` | Findings separate 應 from 得 and cite current law |
+| Bidder gets findings it cannot act on; lint needs a file before consent; verdict wording varies | instructions | `SKILL.md` | Bidder gets questions and deadlines; verdicts follow one rule |
+| New behaviour unverifiable | validation rules | `assets/evals/*`, `scripts/rfp_lint_selftest.py` | Regressions fail mechanically |
+
+### Observed results
+
+| Check | Baseline `rfp_lint-8` | Candidate `rfp_lint-9` |
+|---|---|---|
+| Frozen benchmark, development | 5/29 | 29/29 |
+| Frozen benchmark, held-out first run | 14/25 | 25/25 |
+| Real-document form check | 1/6 | 6/6 |
+
+- The benchmark file (SHA-256 `2433693054b61b95ba1fc77b95a14f4bec4674213487ffafbc17273bf67480b5`) was frozen before candidate code; the eight v1 cases are unchanged. The runner's shared draft gained the award-method and passing-score lines, identically for both versions.
+- The held-out cases were written by the same author as the candidate, so they are a discipline, not an independent sample. The six real-document forms came from a PCC example and three public tender documents and are the stronger evidence; they exposed page-split tables, official passing-score wording, lawful zero-score absence, bracketed percentages and quorum sentences before the held-out run. Those forms are kept as selftests, and the source documents are not in the repository.
+- After the held-out run no scoring rule changed. One input-layer guard was added afterwards: stdin mangled by Windows PowerShell 5.1 now exits 2. A fresh PowerShell 5.1 session reproduced it, reporting 4/20 on the valid starter before the fix.
+
+### Legal freshness
+
+Checked against 全國法規資料庫 and the PCC site on 2026-10-31. Revision dates match `references/source-register.md`: 政府採購法 108/05/22, 最有利標評選辦法 114/01/21, 機關委託資訊服務廠商評選及計費辦法 114/05/23, 採購評選委員會組織準則 115/05/08, 招標期限標準 98/08/31, 資通安全管理法 114/09/24, its 施行細則 115/01/05, 個人資料保護法施行細則 105/03/02, 人工智慧基本法 115/01/14. The 114/11/11 個人資料保護法 amendment is promulgated but not in force. Next review is 2027-01-29.
+
+### Final validation
+
+Filled from the run recorded in `release/evidence-20261031.json`.
+
+### Rollback and residual risk
+
+- Rollback: return to tag `v2026.8.28` and reinstall from it. Installed copies can also keep the previous folder until this release is confirmed.
+- Not measured: no live model run of the write, review or bidder-side flows, and no live trigger eval of the changed description. The 9 new task evals and 6 new trigger evals are written, not replayed.
+- The 20/20 coverage figure still only means keywords were found. `rfp_lint` does not detect brand lock-in, requirement quality or whether a clause is adequate; the rubric owns those.
+- Field coverage is small: forms from four documents, read through a PDF parser and directly quoted excerpts. Full-document false-positive rates on real RFPs are unmeasured.
+- A parent item and its sub-items listed in the same weight column are summed twice and can raise `weight_sum`.
+- The 資安檢核事項 file, 資訊服務採購作業指引 and 生成式 AI 參考指引 are referenced by name only; their contents were not checked item by item.
+- 工程會 is consulting on a procurement law amendment including threshold changes; it had not taken effect at the check date.
+
 ## Release - 2026-08-28 (version 2026.8.28, status: published)
 
 Audit date: 2026-08-28. Current version: `2026.8.28`. Lifecycle status: **published**; the prior rollback release is `2026.6.25`. Linter grader: `rfp_lint-8`.

@@ -1,15 +1,15 @@
 name: rfp-architect
 status: published
-version: 2026.8.28
+version: 2026.10.31
 owner: "Openclaw-Metis"
 archetype: general
 primary_structure_pattern: pipeline
 lifecycle:
   created_at: 2026-06-15
-  last_validated_at: 2026-08-28
-  last_released_at: 2026-08-28
+  last_validated_at: 2026-10-31
+  last_released_at: 2026-10-31
   review_interval_days: 90
-  next_review_due: 2026-11-26
+  next_review_due: 2027-01-29
 support:
   primary_hosts:
     - agent-skills
@@ -23,10 +23,11 @@ risk:
   # personal-data processing detail — treat user input as medium-to-high sensitivity.
   skill_static_data_sensitivity: low
   user_input_data_sensitivity: medium_to_high_possible
-  handling_note: "RFP drafts may contain procurement budget, architecture, security and personal-data processing details; do not route draft content through external APIs unless the user explicitly requests it."
+  handling_note: "RFP drafts may contain procurement budget, architecture, security and personal-data processing details; tender documents stay confidential before publication (Government Procurement Act art. 34), so do not route draft content through external APIs unless the user explicitly requests it."
 dependencies:
   scripts:
     - scripts/rfp_lint.py
+    - scripts/rfp_extract.py
     - scripts/rfp_lint_selftest.py
     - scripts/run_linter_benchmark.py
     - scripts/audit_release_evidence.py
@@ -49,8 +50,10 @@ stewardship:
 portfolio:
   overlaps_with: []
   hands_off_to:
-    - deep-research
+    - deep-research-metis
+    - slide-studio
     - cc-designer
+    - spec-organizer
   depends_on: []
   supersedes: []
   deprecated_by: null

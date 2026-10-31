@@ -28,7 +28,7 @@ Primary objective: verify the encoded law against the official text, then fix wh
 
 - The benchmark file (SHA-256 `2433693054b61b95ba1fc77b95a14f4bec4674213487ffafbc17273bf67480b5`) was frozen before candidate code; the eight v1 cases are unchanged. The runner's shared draft gained the award-method and passing-score lines, identically for both versions.
 - The held-out cases were written by the same author as the candidate, so they are a discipline, not an independent sample. The six real-document forms came from a PCC example and three public tender documents and are the stronger evidence; they exposed page-split tables, official passing-score wording, lawful zero-score absence, bracketed percentages and quorum sentences before the held-out run. Those forms are kept as selftests, and the source documents are not in the repository.
-- After the held-out run no scoring rule changed. One input-layer guard was added afterwards: stdin mangled by Windows PowerShell 5.1 now exits 2. A fresh PowerShell 5.1 session reproduced it, reporting 4/20 on the valid starter before the fix.
+- After the held-out run no scoring rule changed. Two input-layer changes followed in `scripts/rfp_extract.py`: stdin mangled by Windows PowerShell 5.1 now exits 2 (a fresh session reported 4/20 on the valid starter before the fix), and ODT merged cells no longer add empty columns.
 
 ### Legal freshness
 
@@ -36,7 +36,17 @@ Checked against 全國法規資料庫 and the PCC site on 2026-10-31. Revision d
 
 ### Final validation
 
-Filled from the run recorded in `release/evidence-20261031.json`.
+Run on the released tree on 2026-10-31 with `python -B` and `PYTHONUTF8=1`. Structured results are in `release/evidence-20261031.json`.
+
+- `python scripts/rfp_lint_selftest.py` — PASS
+- `python scripts/run_linter_benchmark.py --split all` — PASS (54/54)
+- `python scripts/rfp_lint.py examples/starter/output.md --track government` — PASS (20/20, 0 rule violations, 0 warnings)
+- `python scripts/rfp_lint.py assets/templates/rfp-skeleton.md --track government` — EXPECTED FAIL (placeholder guard observed)
+- `python scripts/audit_release_evidence.py . --json` — PASS
+- SkillOps validator 3.11.0, stages revise, evaluate, security, package and publish, plus `release_gate.py --stage publish` — PASS
+- SkillOps stage optimize — BLOCKED, as expected: it requires live benchmark evidence and none was run. The frozen benchmark above is deterministic and is not submitted in its place. The 2026.8.28 entry recorded this stage as PASS under an earlier validator.
+- End to end with files written by Microsoft Word 16: a `.docx` and an `.odt` with a merged title row and heading style reached the price rule at the correct line. This found and fixed an ODT column-padding bug.
+- Remote push, tag and release were requested by the user on 2026-10-31.
 
 ### Rollback and residual risk
 

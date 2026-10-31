@@ -1,10 +1,10 @@
 {
   "artifact_type": "benchmark-summary",
   "source_path": "release/benchmark-smoke-20261031.json",
-  "source_sha256": "a44e28ffbebea467e5945d85b915a2930052a8ecc6e08d2347efed3bad55cb7b",
+  "source_sha256": "5cd06635d24bf15e7c110f5a25b996daed8bd2a13981ee656986af91c27ed20c",
   "metadata": {
     "skill_version": "2026.10.31",
-    "git_commit": "pending",
+    "git_commit": "50227a9",
     "host": "local/python3",
     "model": "none-deterministic",
     "temperature": null,
@@ -29,7 +29,7 @@
     "development": "29/29 PASS",
     "held_out_first_run": "25/25 PASS",
     "real_document_forms": "6/6 PASS (baseline 1/6)",
-    "skillops_required_gates": "PENDING"
+    "skillops_required_gates": "PASS"
   },
   "decision": "ACCEPT",
   "notes": [
